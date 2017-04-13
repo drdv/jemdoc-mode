@@ -25,8 +25,7 @@
 
 ;; Quick start:
 ;;
-;; 1. add (require 'jemdoc-mode) to your .emacs
-;; 2. to activate/deactivate jemdoc mode, just type M-x jemdoc-mode
+;; add (require 'jemdoc-mode) to your .emacs
 
 ;;; Code:
 
@@ -162,9 +161,9 @@ or #include{name of file}."
 
 
 
-(defvar jemdoc-debug-on nil
+(defvar jemdoc-debug-messages nil
   "Use to output debug messages.")
-(make-local-variable 'jemdoc-debug-on)
+(make-local-variable 'jemdoc-debug-messages)
 
 (defvar jemdoc-mode-map
   (let ((map (make-sparse-keymap)))
@@ -313,12 +312,12 @@ There are two formats: +{{format 1}}+ and %format 2%."
 (defun jemdoc-extend-bullet-region ()
   "Extend region to contain encolsing bullet block."
   (save-excursion
-    (when jemdoc-debug-on
+    (when jemdoc-debug-messages
       (message "----------------------------------------------------")
       (message "[initial]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
     (save-excursion
       (goto-char (line-beginning-position 2))
-      (when jemdoc-debug-on
+      (when jemdoc-debug-messages
 	(message "[move down]: point = %d" (point)))
       ;; search for
       ;; ^ *- +   (bullet with one dash)
@@ -328,7 +327,7 @@ There are two formats: +{{format 1}}+ and %format 2%."
       ;; ^~~~ *$  (beginning or end of a tilde block)
       (if (re-search-forward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\'\\|^~~~ *$\\)" nil t)
 	  (progn
-	    (when jemdoc-debug-on
+	    (when jemdoc-debug-messages
 	      (message "[after first search]: point = %d" (point)))
 	    ;; Here I don't include the last line, because if it is the
 	    ;; beginning of a tilde block, later on it would be included
@@ -349,20 +348,20 @@ There are two formats: +{{format 1}}+ and %format 2%."
     ;; \\` (i.e., beginning of buffer) instead of \\' (i.e., end of buffer)
     (if (re-search-backward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\`\\|^~~~ *$\\)" nil t)
 	(progn
-	  (when jemdoc-debug-on
+	  (when jemdoc-debug-messages
 	    (message "[after second search]: point = %d" (point)))
 	  (when (< (match-beginning 0) font-lock-beg) ;; don't shorten the region
 	    (setq font-lock-beg (match-beginning 0))))
       (setq font-lock-beg (point-min)))
     )
-  (when jemdoc-debug-on
+  (when jemdoc-debug-messages
     (message "[extend]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
   nil)
 
 (defun jemdoc-extend-region-initialize (beg end &optional len)
   "Reset `jemdoc-region-extended-already'.
 
-BEG, END and LEN are the standard arguments provided to ‘after-change-functions’."
+BEG, END and LEN are the standard arguments provided to `after-change-functions'."
   (setq jemdoc-region-extended-already nil)
   nil)
 
@@ -372,7 +371,7 @@ BEG, END and LEN are the standard arguments provided to ‘after-change-function
     (setq jemdoc-region-extended-already t)
     (jemdoc-extend-bullet-region)
     (jemdoc-extend-tilde-region))
-  (when jemdoc-debug-on
+  (when jemdoc-debug-messages
     (message "[while]: font-lock-beg = %d, font-lock-end = %d" font-lock-beg font-lock-end))
   ;; this function is executed first among the functions in
   ;; `font-lock-extend-region-functions' and there is no problem
@@ -395,7 +394,7 @@ BEG, END and LEN are the standard arguments provided to ‘after-change-function
   "Return position of next delimeter.
 
 delimeters can be: empty line, end of buffer, or line starting with
-STR appearing N or less times."
+STR appearing N or less times in a row."
   (save-excursion
     ;; find an empty line ("^$"), end of buffer ("\\'") or a line starting with 1, ..., n str
     (re-search-forward (let ((S "\\(\\'\\|^ *$"))
@@ -410,7 +409,7 @@ STR appearing N or less times."
 (defun jemdoc-in-tilde-block-internal (tilde-block-type)
   "Check whether point is inside a tilde block.
 
-If point is in a tilde block with type `tilde-block-type'
+If point is inside a tilde block with type TILDE-BLOCK-TYPE
 return a cell array with its beginning and end. If not, return nil.
 
 TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
@@ -637,7 +636,7 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	    ;; so I prefer to not use it
 	    (setq-local font-lock-support-mode jemdoc-font-lock-support-mode)
 
-	    ;; used to not fontify code blocks
+	    ;; used to not fontify blocks of code
 	    (when (package-installed-p 'font-lock+)
 	      (require 'font-lock+))
 	    ))
