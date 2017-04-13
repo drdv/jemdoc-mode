@@ -5,7 +5,7 @@
 ;; Author: Dimitar Dimitrov <mail.mitko@gmail.com>
 ;; URL: https://github.com/drdv/jemdoc-mode
 ;; Package-Version: 20170413.1
-;; Package-Requires: ()
+;; Package-Requires: ((emacs "24.3"))
 ;; Keywords: convenience, usability
 
 ;; This file is not part of GNU Emacs.
@@ -162,6 +162,10 @@ or #include{name of file}."
 
 
 
+(defvar jemdoc-debug-on nil
+  "Use to output debug messages.")
+(make-local-variable 'jemdoc-debug-on)
+
 (defvar jemdoc-mode-map
   (let ((map (make-sparse-keymap)))
     ;; define your key bindings
@@ -170,13 +174,13 @@ or #include{name of file}."
   "Keymap for jemdoc major mode.")
 (make-local-variable 'jemdoc-mode-map)
 
-(defvar drdv-extended-already nil
+(defvar jemdoc-region-extended-already nil
   "`jemdoc-extend-region' should change the region only once per iteration.
 
 After each font-lock iteration, it is set back to nil in
 `jemdoc-extend-region-initialize', which is registerd in
 `font-lock-extend-after-change-region-function'.")
-(make-local-variable 'drdv-extended-already)
+(make-local-variable 'jemdoc-region-extended-already)
 
 (defvar jemdoc-font-lock-syntax-table
   (let ((st (make-syntax-table)))
@@ -191,6 +195,14 @@ After each font-lock iteration, it is set back to nil in
 (defvar jemdoc-font-lock-support-mode nil
   "Specify the support mode for jemdoc.")
 (make-local-variable 'jemdoc-font-lock-support-mode)
+
+(defvar font-lock-beg nil
+  "To suppress warning during byte-compilation.")
+(make-local-variable 'font-lock-beg)
+
+(defvar font-lock-end nil
+  "To suppress warning during byte-compilation.")
+(make-local-variable 'font-lock-end)
 
 
 
@@ -280,18 +292,16 @@ There are two formats: +{{format 1}}+ and %format 2%."
 
 
 
-(defun jemdoc-extend-tilde-region (&optional debug-messages-on)
-  "Extend region to contain encolsing tilde block.
-
-if DEBUG-MESSAGES-ON is non-nil display debug information."
+(defun jemdoc-extend-tilde-region ()
+  "Extend region to contain encolsing tilde block."
   (let ((region-beg)
 	(region-end))
     (save-excursion
       (goto-char font-lock-beg)
-      (setq region-beg (in-tilde-block-internal 'general-block)))
+      (setq region-beg (jemdoc-in-tilde-block-internal 'general-block)))
     (save-excursion
       (goto-char font-lock-end)
-      (setq region-end (in-tilde-block-internal 'general-block)))
+      (setq region-end (jemdoc-in-tilde-block-internal 'general-block)))
     (when (and region-beg
 	       (< (car region-beg) font-lock-beg)) ;; don't shorten the region
       (setq font-lock-beg (car region-beg)))
@@ -300,17 +310,15 @@ if DEBUG-MESSAGES-ON is non-nil display debug information."
       (setq font-lock-end (cdr region-end)))
     ))
 
-(defun jemdoc-extend-bullet-region (&optional debug-messages-on)
-  "Extend region to contain encolsing bullet block.
-
-if DEBUG-MESSAGES-ON is non-nil display debug information."
+(defun jemdoc-extend-bullet-region ()
+  "Extend region to contain encolsing bullet block."
   (save-excursion
-    (when debug-messages-on
+    (when jemdoc-debug-on
       (message "----------------------------------------------------")
       (message "[initial]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
     (save-excursion
       (goto-char (line-beginning-position 2))
-      (when debug-messages-on
+      (when jemdoc-debug-on
 	(message "[move down]: point = %d" (point)))
       ;; search for
       ;; ^ *- +   (bullet with one dash)
@@ -320,7 +328,7 @@ if DEBUG-MESSAGES-ON is non-nil display debug information."
       ;; ^~~~ *$  (beginning or end of a tilde block)
       (if (re-search-forward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\'\\|^~~~ *$\\)" nil t)
 	  (progn
-	    (when debug-messages-on
+	    (when jemdoc-debug-on
 	      (message "[after first search]: point = %d" (point)))
 	    ;; Here I don't include the last line, because if it is the
 	    ;; beginning of a tilde block, later on it would be included
@@ -341,31 +349,30 @@ if DEBUG-MESSAGES-ON is non-nil display debug information."
     ;; \\` (i.e., beginning of buffer) instead of \\' (i.e., end of buffer)
     (if (re-search-backward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\`\\|^~~~ *$\\)" nil t)
 	(progn
-	  (when debug-messages-on
+	  (when jemdoc-debug-on
 	    (message "[after second search]: point = %d" (point)))
 	  (when (< (match-beginning 0) font-lock-beg) ;; don't shorten the region
 	    (setq font-lock-beg (match-beginning 0))))
       (setq font-lock-beg (point-min)))
     )
-  (when debug-messages-on
+  (when jemdoc-debug-on
     (message "[extend]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
   nil)
 
 (defun jemdoc-extend-region-initialize (beg end &optional len)
-  "Reset `drdv-extended-already'.
+  "Reset `jemdoc-region-extended-already'.
 
 BEG, END and LEN are the standard arguments provided to ‘after-change-functions’."
-  (setq drdv-extended-already nil)
+  (setq jemdoc-region-extended-already nil)
   nil)
 
 (defun jemdoc-extend-region()
   "Extend the font-lock region."
-  (setq-local debug-messages-on nil)
-  (unless drdv-extended-already
-    (setq drdv-extended-already t)
-    (jemdoc-extend-bullet-region debug-messages-on)
-    (jemdoc-extend-tilde-region debug-messages-on))
-  (when debug-messages-on
+  (unless jemdoc-region-extended-already
+    (setq jemdoc-region-extended-already t)
+    (jemdoc-extend-bullet-region)
+    (jemdoc-extend-tilde-region))
+  (when jemdoc-debug-on
     (message "[while]: font-lock-beg = %d, font-lock-end = %d" font-lock-beg font-lock-end))
   ;; this function is executed first among the functions in
   ;; `font-lock-extend-region-functions' and there is no problem
@@ -400,7 +407,7 @@ STR appearing N or less times."
 
 
 
-(defun in-tilde-block-internal (tilde-block-type)
+(defun jemdoc-in-tilde-block-internal (tilde-block-type)
   "Check whether point is inside a tilde block.
 
 If point is in a tilde block with type `tilde-block-type'
@@ -440,7 +447,7 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 (defun jemdoc-ignore-region ()
   "Assigne text property 'font-lock-ignore for code-blocks."
   (interactive)
-  (let ((region (in-tilde-block-internal 'code-block))
+  (let ((region (jemdoc-in-tilde-block-internal 'code-block))
 	start
 	end)
     (when region
