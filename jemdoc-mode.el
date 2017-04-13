@@ -167,14 +167,15 @@ or #include{name of file}."
     ;; define your key bindings
     ;;(define-key map (kbd ...) '...)
     map)
-  "Keymap for jemdoc major mode")
+  "Keymap for jemdoc major mode.")
 (make-local-variable 'jemdoc-mode-map)
 
 (defvar drdv-extended-already nil
-  "Makes sure that `jemdoc-extend-region' does not change the font-lock region more than once in a font-lock iteration.
+  "`jemdoc-extend-region' should change the region only once per iteration.
 
-After each font-lock iteration, it is set back to nil in `jemdoc-extend-region-initialize',
-which is registerd in `font-lock-extend-after-change-region-function'.")
+After each font-lock iteration, it is set back to nil in
+`jemdoc-extend-region-initialize', which is registerd in
+`font-lock-extend-after-change-region-function'.")
 (make-local-variable 'drdv-extended-already)
 
 (defvar jemdoc-font-lock-syntax-table
@@ -194,12 +195,11 @@ which is registerd in `font-lock-extend-after-change-region-function'.")
 
 
 (defun jemdoc-syntax-propertize-function (start end)
-  "Assign text properties.
+  "Assign text properties from START to END.
 
 Text properties:
   jemdoc-keywords-in-comments-property: delimits keywords in comments
-  font-lock-ignore: used by font-lock+ to ignore region (and not fontify it)
-"
+  font-lock-ignore: used by font-lock+ to ignore region (and not fontify it)."
   (let ((case-fold-search nil))
     (goto-char start)
 
@@ -236,7 +236,7 @@ Text properties:
 			 (cons (nth 4 context) (match-data))))))
 
 (defun jemdoc-property-retrieve (limit)
-  "Highlight regions with text property jemdoc-keywords-in-comments-property."
+  "Highlight text with jemdoc-keywords-in-comments-property until LIMIT."
   (let ((pos (next-single-char-property-change (point)
 					       'jemdoc-keywords-in-comments-property
                                                nil limit)))
@@ -252,10 +252,9 @@ Text properties:
 
 
 (defun jemdoc-highlight-curly-brackets-tilde-block (limit)
-  "Highlights curly brackets in the preamble of a tilde block.
+  "Highlight curly brackets in the preamble of a tilde block (until LIMIT).
 
-- pictures format is handled using: {}{.*?}{.*?}{.*?}{.*?}{.*?}{.*?}.
-"
+- pictures format is handled using: {}{.*?}{.*?}{.*?}{.*?}{.*?}{.*?}."
   (when (re-search-forward "^ *\\({}{.*?}{.*?}{.*?}{.*?}{.*?}{.*?}\\|{.*?} *{.*?}\\|{.*?}\\)" limit t)
     (save-excursion
       (save-match-data
@@ -268,21 +267,23 @@ Text properties:
     t))
 
 (defun jemdoc-highlight-monospace-html-text (limit)
-  "Highlights monospace html text.
+  "Highlight monospace html text (until LIMIT).
 
 There are two formats: +{{format 1}}+ and %format 2%."
   (when (re-search-forward "\\(\\+{{.*?}}\\+\\|%.*?%\\)" limit t)
     t))
 
 (defun jemdoc-highlight-curly-brackets-html-text (limit)
-  "Highlights curly brackets with html text."
+  "Highlight curly brackets with html text (until LIMIT)."
   (when (re-search-forward "{{.*?}}" limit t)
     t))
 
 
 
 (defun jemdoc-extend-tilde-region (&optional debug-messages-on)
-  "Extend region to contain encolsing tilde block."
+  "Extend region to contain encolsing tilde block.
+
+if DEBUG-MESSAGES-ON is non-nil display debug information."
   (let ((region-beg)
 	(region-end))
     (save-excursion
@@ -300,7 +301,9 @@ There are two formats: +{{format 1}}+ and %format 2%."
     ))
 
 (defun jemdoc-extend-bullet-region (&optional debug-messages-on)
-  "Extend region to contain encolsing bullet block."
+  "Extend region to contain encolsing bullet block.
+
+if DEBUG-MESSAGES-ON is non-nil display debug information."
   (save-excursion
     (when debug-messages-on
       (message "----------------------------------------------------")
@@ -349,7 +352,9 @@ There are two formats: +{{format 1}}+ and %format 2%."
   nil)
 
 (defun jemdoc-extend-region-initialize (beg end &optional len)
-  "Reset `drdv-extended-already'."
+  "Reset `drdv-extended-already'.
+
+BEG, END and LEN are the standard arguments provided to ‘after-change-functions’."
   (setq drdv-extended-already nil)
   nil)
 
@@ -372,7 +377,7 @@ There are two formats: +{{format 1}}+ and %format 2%."
 
 
 (defun jemdoc-concat-string (str n)
-  "Concatenate a string STR, N times"
+  "Concatenate a string STR, N times."
   (let ((out-str))
     (while (> n 0)
       (setq out-str (concat out-str str))
@@ -380,7 +385,10 @@ There are two formats: +{{format 1}}+ and %format 2%."
     out-str))
 
 (defun jemdoc-end-of-block (str n)
-  "Return position of next empty line, end of buffer, or line starting with N or less times STR."
+  "Return position of next delimeter.
+
+delimeters can be: empty line, end of buffer, or line starting with
+STR appearing N or less times."
   (save-excursion
     ;; find an empty line ("^$"), end of buffer ("\\'") or a line starting with 1, ..., n str
     (re-search-forward (let ((S "\\(\\'\\|^ *$"))
@@ -393,11 +401,12 @@ There are two formats: +{{format 1}}+ and %format 2%."
 
 
 (defun in-tilde-block-internal (tilde-block-type)
-  "If point is in a tilde block with type `tilde-block-type' return a cell array with its beginning and end.
+  "Check whether point is inside a tilde block.
 
-If not, return nil.
-`tilde-block-type' can be 'code-block, 'general-block
-"
+If point is in a tilde block with type `tilde-block-type'
+return a cell array with its beginning and end. If not, return nil.
+
+TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
   (save-excursion
     (let ((p (point))
 	  (regexp (if (eq tilde-block-type 'code-block)
