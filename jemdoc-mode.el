@@ -162,7 +162,7 @@ or #include{name of file}."
 
 
 (defvar jemdoc-debug-messages nil
-  "Use to output debug messages.")
+  "Set to non-nil to output debug messages.")
 (make-local-variable 'jemdoc-debug-messages)
 
 (defvar jemdoc-mode-map
@@ -184,7 +184,7 @@ After each font-lock iteration, it is set back to nil in
 (defvar jemdoc-font-lock-syntax-table
   (let ((st (make-syntax-table)))
     ;; I use the "b" below because otherwise the single-line comments
-    ;; interfere with other comments that I might want to define
+    ;; interfere with other comments that I might want to define.
     (modify-syntax-entry ?#  "< b" st)
     (modify-syntax-entry ?\n ">#b" st)
     st)
@@ -292,7 +292,12 @@ There are two formats: +{{format 1}}+ and %format 2%."
 
 
 (defun jemdoc-extend-tilde-region ()
-  "Extend region to contain encolsing tilde block."
+  "Extend region to contain encolsing tilde block.
+
+This function is called in `jemdoc-extend-region' which is registered
+in `font-lock-extend-region-functions' and is called by font-lock during
+fontification. The variables `font-lock-beg' and `font-lock-end' in the code
+refer to dynamically bound variables used by font-lock."
   (let ((region-beg)
 	(region-end))
     (save-excursion
@@ -310,7 +315,12 @@ There are two formats: +{{format 1}}+ and %format 2%."
     ))
 
 (defun jemdoc-extend-bullet-region ()
-  "Extend region to contain encolsing bullet block."
+  "Extend region to contain encolsing bullet block.
+
+This function is called in `jemdoc-extend-region' which is registered
+in `font-lock-extend-region-functions' and is called by font-lock during
+fontification. The variables `font-lock-beg' and `font-lock-end' in the code
+refer to dynamically bound variables used by font-lock."
   (save-excursion
     (when jemdoc-debug-messages
       (message "----------------------------------------------------")
@@ -366,7 +376,9 @@ BEG, END and LEN are the standard arguments provided to `after-change-functions'
   nil)
 
 (defun jemdoc-extend-region()
-  "Extend the font-lock region."
+  "Extend the font-lock region.
+
+registered in `font-lock-extend-region-functions'."
   (unless jemdoc-region-extended-already
     (setq jemdoc-region-extended-already t)
     (jemdoc-extend-bullet-region)
@@ -393,7 +405,7 @@ BEG, END and LEN are the standard arguments provided to `after-change-functions'
 (defun jemdoc-end-of-block (str n)
   "Return position of next delimeter.
 
-delimeters can be: empty line, end of buffer, or line starting with
+Delimeters can be: empty line, end of buffer, or line starting with
 STR appearing N or less times in a row."
   (save-excursion
     ;; find an empty line ("^$"), end of buffer ("\\'") or a line starting with 1, ..., n str
@@ -409,7 +421,7 @@ STR appearing N or less times in a row."
 (defun jemdoc-in-tilde-block-internal (tilde-block-type)
   "Check whether point is inside a tilde block.
 
-If point is inside a tilde block with type TILDE-BLOCK-TYPE
+If point is inside a tilde block with type TILDE-BLOCK-TYPE,
 return a cell array with its beginning and end. If not, return nil.
 
 TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
@@ -444,7 +456,7 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	))))
 
 (defun jemdoc-ignore-region ()
-  "Assigne text property 'font-lock-ignore for code-blocks."
+  "Assigne text property 'font-lock-ignore to code-blocks."
   (interactive)
   (let ((region (jemdoc-in-tilde-block-internal 'code-block))
 	start
@@ -636,7 +648,8 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	    ;; so I prefer to not use it
 	    (setq-local font-lock-support-mode jemdoc-font-lock-support-mode)
 
-	    ;; used to not fontify blocks of code
+	    ;; used to not fontify code blocks
+	    ;; (see the font-lock-ignore text property)
 	    (when (package-installed-p 'font-lock+)
 	      (require 'font-lock+))
 	    ))
