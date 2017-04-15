@@ -45,142 +45,142 @@
 
 
 
-(defface jemdoc-face-monospace
+(defface jemdoc-mode-face-monospace
     '((t . (:inherit font-lock-type-face)))
   "Face for +monospace+."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-bold
+(defface jemdoc-mode-face-bold
     '((t . (:inherit 'bold)))
   "Face for *bold*."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-italics
+(defface jemdoc-mode-face-italics
     '((t . (:inherit 'shadow)))
   "Face for /italics/."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-tilde-block-delimeters
+(defface jemdoc-mode-face-tilde-block-delimeters
     '((t . (:inherit 'success)))
   "Face for tilde block delimeters."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-equation
+(defface jemdoc-mode-face-equation
     '((t . (:inherit font-lock-keyword-face)))
   "Face for $inline equation$ or \(equation\)."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-special-keywords
+(defface jemdoc-mode-face-special-keywords
     '((t . (:inherit font-lock-variable-name-face)))
   "Face for special keywords.
 For example, keywords in comments or the definition construct : {}."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-special-keywords-name
+(defface jemdoc-mode-face-special-keywords-name
     '((t . (:inherit font-lock-function-name-face)))
   "Face for names in special keywords.
 For example the definition construct : {A name}
 or #include{name of file}."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-monospace-html
+(defface jemdoc-mode-face-monospace-html
     '((t . (:inherit font-lock-function-name-face)))
   "Face for +{{monospace html}}+ which is equivalent to %monospace html%."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-other
+(defface jemdoc-mode-face-other
     '((t . (:inherit font-lock-constant-face)))
   "Face for \\n \\A \\C \\R \\M etc."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-http-mail
+(defface jemdoc-mode-face-http-mail
     '((t . (:inherit font-lock-constant-face
 	    :weight bold)))
   "Face for [http/mail block]."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-dashes-2
+(defface jemdoc-mode-face-dashes-2
     '((t . (:foreground "sienna"
 	    :weight bold)))
   "Face for --."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-dashes-3
+(defface jemdoc-mode-face-dashes-3
     '((t . (:foreground "Blue1"
 	    :weight bold)))
   "Face for ---."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-ellipsis
+(defface jemdoc-mode-face-ellipsis
     '((t . (:foreground "Blue1"
 	    :weight bold)))
   "Face for ellipsis (...)."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-html-text
+(defface jemdoc-mode-face-html-text
     '((t . (:foreground "color-105")))
   "Face for {{html text}}."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-bullet
+(defface jemdoc-mode-face-bullet
     '((t .(:foreground "red"
 	   :weight bold)))
   "Face for bullets."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-bullet-warning
+(defface jemdoc-mode-face-bullet-warning
     '((t . (:foreground "white"
 	    :background "red"
 	    :weight bold)))
   "Warning face for bullets."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-title-1
+(defface jemdoc-mode-face-title-1
     '((t . (:foreground "color-18"
 	    :weight bold)))
   "Face for title with one \"=\"."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-title-2
+(defface jemdoc-mode-face-title-2
     '((t . (:foreground "color-21"
 	    :weight bold)))
   "Face for title with two \"==\"."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-title-3
+(defface jemdoc-mode-face-title-3
     '((t . (:foreground "color-27"
 	    :weight bold)))
   "Face for title with three \"===\"."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
-(defface jemdoc-face-title-4
+(defface jemdoc-mode-face-title-4
     '((t . (:foreground "color-33"
 	    :weight bold)))
   "Face for title with four \"====\"."
-  :group 'jemdoc-faces)
+  :group 'jemdoc-mode-faces)
 
 
 
-(defvar jemdoc-debug-messages nil
+(defvar jemdoc-mode-debug-messages nil
   "Set to non-nil to output debug messages.")
-(make-local-variable 'jemdoc-debug-messages)
+(make-local-variable 'jemdoc-mode-debug-messages)
 
 (defvar jemdoc-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x n r") 'jemdoc-narrow-to-code-block)
+    (define-key map (kbd "C-x n r") 'jemdoc-mode-narrow-to-code-block)
     map)
   "Keymap for jemdoc major mode.")
 (make-local-variable 'jemdoc-mode-map)
 
-(defvar jemdoc-region-extended-already nil
-  "`jemdoc-extend-region' should change the region only once per iteration.
+(defvar jemdoc-mode-region-extended-already nil
+  "`jemdoc-mode-extend-region' should change the region only once per iteration.
 
 After each font-lock iteration, it is set back to nil in
-`jemdoc-extend-region-initialize', which is registerd in
+`jemdoc-mode-extend-region-initialize', which is registerd in
 `font-lock-extend-after-change-region-function'.")
-(make-local-variable 'jemdoc-region-extended-already)
+(make-local-variable 'jemdoc-mode-region-extended-already)
 
-(defvar jemdoc-font-lock-syntax-table
+(defvar jemdoc-mode-font-lock-syntax-table
   (let ((st (make-syntax-table)))
     ;; I use the "b" below because otherwise the single-line comments
     ;; interfere with other comments that I might want to define.
@@ -188,11 +188,11 @@ After each font-lock iteration, it is set back to nil in
     (modify-syntax-entry ?\n ">#b" st)
     st)
   "Syntax table for `jemdoc-mode'.")
-(make-local-variable 'jemdoc-font-lock-syntax-table)
+(make-local-variable 'jemdoc-mode-font-lock-syntax-table)
 
-(defvar jemdoc-font-lock-support-mode nil
+(defvar jemdoc-mode-font-lock-support-mode nil
   "Specify the support mode for jemdoc.")
-(make-local-variable 'jemdoc-font-lock-support-mode)
+(make-local-variable 'jemdoc-mode-font-lock-support-mode)
 
 (defvar font-lock-beg nil
   "To suppress warning during byte-compilation.")
@@ -204,7 +204,7 @@ After each font-lock iteration, it is set back to nil in
 
 
 
-(defun jemdoc-syntax-propertize-function (start end)
+(defun jemdoc-mode-syntax-propertize-function (start end)
   "Assign text properties from START to END.
 
 Text properties:
@@ -224,28 +224,28 @@ Text properties:
 		     "addjs" "addpackage" "addtex" "analytics" "title"
 		     "noeqs" "noeqcache" "eqsize" "eqdir")
 		   'words)
-       (0 (ignore (jemdoc-property-assign))))
+       (0 (ignore (jemdoc-mode-property-assign))))
       ;; regions to be ignored
       ("^~~~ *$"
-       (0 (ignore (jemdoc-ignore-region))))
+       (0 (ignore (jemdoc-mode-ignore-region))))
       )
      start end)))
 
-(defun jemdoc-property-assign ()
+(defun jemdoc-mode-property-assign ()
   "Assign text properties in keywords in comments."
   (let* ((beg (match-beginning 0))
 	 (str-line (thing-at-point 'line t))
-	 (jemdoc-line-start-p (if (> (length str-line) 9)
+	 (jemdoc-mode-line-start-p (if (> (length str-line) 9)
 				  (equal (substring str-line 0 9) "# jemdoc:")
 				nil))
 	 (context (save-excursion
 		    (save-match-data (syntax-ppss beg)))))
-    (when jemdoc-line-start-p
+    (when jemdoc-mode-line-start-p
       (put-text-property beg (1+ beg)
 			 'jemdoc-keywords-in-comments-property
 			 (cons (nth 4 context) (match-data))))))
 
-(defun jemdoc-property-retrieve (limit)
+(defun jemdoc-mode-property-retrieve (limit)
   "Highlight text with jemdoc-keywords-in-comments-property until LIMIT."
   (let ((pos (next-single-char-property-change (point)
 					       'jemdoc-keywords-in-comments-property
@@ -257,11 +257,11 @@ Text properties:
             (progn
               (set-match-data (cdr value))
               t)
-          (jemdoc-property-retrieve limit))))))
+          (jemdoc-mode-property-retrieve limit))))))
 
 
 
-(defun jemdoc-highlight-curly-brackets-tilde-block (limit)
+(defun jemdoc-mode-highlight-curly-brackets-tilde-block (limit)
   "Highlight curly brackets in the preamble of a tilde block (until LIMIT).
 
 - pictures format is handled using: {}{.*?}{.*?}{.*?}{.*?}{.*?}{.*?}."
@@ -276,24 +276,24 @@ Text properties:
 	  (set-match-data nil))))
     t))
 
-(defun jemdoc-highlight-monospace-html-text (limit)
+(defun jemdoc-mode-highlight-monospace-html-text (limit)
   "Highlight monospace html text (until LIMIT).
 
 There are two formats: +{{format 1}}+ and %format 2%."
   (when (re-search-forward "\\(\\+{{.*?}}\\+\\|%.*?%\\)" limit t)
     t))
 
-(defun jemdoc-highlight-curly-brackets-html-text (limit)
+(defun jemdoc-mode-highlight-curly-brackets-html-text (limit)
   "Highlight curly brackets with html text (until LIMIT)."
   (when (re-search-forward "{{.*?}}" limit t)
     t))
 
 
 
-(defun jemdoc-extend-tilde-region ()
+(defun jemdoc-mode-extend-tilde-region ()
   "Extend region to contain encolsing tilde block.
 
-This function is called in `jemdoc-extend-region' which is registered
+This function is called in `jemdoc-mode-extend-region' which is registered
 in `font-lock-extend-region-functions' and is called by font-lock during
 fontification. The variables `font-lock-beg' and `font-lock-end' in the code
 refer to dynamically bound variables used by font-lock."
@@ -301,10 +301,10 @@ refer to dynamically bound variables used by font-lock."
 	(region-end))
     (save-excursion
       (goto-char font-lock-beg)
-      (setq region-beg (jemdoc-in-tilde-block-internal 'general-block)))
+      (setq region-beg (jemdoc-mode-in-tilde-block-internal 'general-block)))
     (save-excursion
       (goto-char font-lock-end)
-      (setq region-end (jemdoc-in-tilde-block-internal 'general-block)))
+      (setq region-end (jemdoc-mode-in-tilde-block-internal 'general-block)))
     (when (and region-beg
 	       (< (car region-beg) font-lock-beg)) ;; don't shorten the region
       (setq font-lock-beg (car region-beg)))
@@ -313,20 +313,20 @@ refer to dynamically bound variables used by font-lock."
       (setq font-lock-end (cdr region-end)))
     ))
 
-(defun jemdoc-extend-bullet-region ()
+(defun jemdoc-mode-extend-bullet-region ()
   "Extend region to contain encolsing bullet block.
 
-This function is called in `jemdoc-extend-region' which is registered
+This function is called in `jemdoc-mode-extend-region' which is registered
 in `font-lock-extend-region-functions' and is called by font-lock during
 fontification. The variables `font-lock-beg' and `font-lock-end' in the code
 refer to dynamically bound variables used by font-lock."
   (save-excursion
-    (when jemdoc-debug-messages
+    (when jemdoc-mode-debug-messages
       (message "----------------------------------------------------")
       (message "[initial]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
     (save-excursion
       (goto-char (line-beginning-position 2))
-      (when jemdoc-debug-messages
+      (when jemdoc-mode-debug-messages
 	(message "[move down]: point = %d" (point)))
       ;; search for
       ;; ^ *- +   (bullet with one dash)
@@ -336,14 +336,14 @@ refer to dynamically bound variables used by font-lock."
       ;; ^~~~ *$  (beginning or end of a tilde block)
       (if (re-search-forward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\'\\|^~~~ *$\\)" nil t)
 	  (progn
-	    (when jemdoc-debug-messages
+	    (when jemdoc-mode-debug-messages
 	      (message "[after first search]: point = %d" (point)))
 	    ;; Here I don't include the last line, because if it is the
 	    ;; beginning of a tilde block, later on it would be included
 	    ;; as well because the end of the region would be inside it
 	    ;; (which is not what I want). On the other hand if the last
 	    ;; line is the end of a tilde region it is included in the region
-	    ;; in `jemdoc-extend-tilde-region'.
+	    ;; in `jemdoc-mode-extend-tilde-region'.
 	    (goto-char (line-end-position 0))
 	    (when (> (point) font-lock-end) ;; don't shorten the region
 	      (setq font-lock-end (point))))
@@ -357,32 +357,32 @@ refer to dynamically bound variables used by font-lock."
     ;; \\` (i.e., beginning of buffer) instead of \\' (i.e., end of buffer)
     (if (re-search-backward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\`\\|^~~~ *$\\)" nil t)
 	(progn
-	  (when jemdoc-debug-messages
+	  (when jemdoc-mode-debug-messages
 	    (message "[after second search]: point = %d" (point)))
 	  (when (< (match-beginning 0) font-lock-beg) ;; don't shorten the region
 	    (setq font-lock-beg (match-beginning 0))))
       (setq font-lock-beg (point-min)))
     )
-  (when jemdoc-debug-messages
+  (when jemdoc-mode-debug-messages
     (message "[extend]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
   nil)
 
-(defun jemdoc-extend-region-initialize (beg end &optional len)
-  "Reset `jemdoc-region-extended-already'.
+(defun jemdoc-mode-extend-region-initialize (beg end &optional len)
+  "Reset `jemdoc-mode-region-extended-already'.
 
 BEG, END and LEN are the standard arguments provided to `after-change-functions'."
-  (setq jemdoc-region-extended-already nil)
+  (setq jemdoc-mode-region-extended-already nil)
   nil)
 
-(defun jemdoc-extend-region()
+(defun jemdoc-mode-extend-region()
   "Extend the font-lock region.
 
 registered in `font-lock-extend-region-functions'."
-  (unless jemdoc-region-extended-already
-    (setq jemdoc-region-extended-already t)
-    (jemdoc-extend-bullet-region)
-    (jemdoc-extend-tilde-region))
-  (when jemdoc-debug-messages
+  (unless jemdoc-mode-region-extended-already
+    (setq jemdoc-mode-region-extended-already t)
+    (jemdoc-mode-extend-bullet-region)
+    (jemdoc-mode-extend-tilde-region))
+  (when jemdoc-mode-debug-messages
     (message "[while]: font-lock-beg = %d, font-lock-end = %d" font-lock-beg font-lock-end))
   ;; this function is executed first among the functions in
   ;; `font-lock-extend-region-functions' and there is no problem
@@ -393,7 +393,7 @@ registered in `font-lock-extend-region-functions'."
 
 
 
-(defun jemdoc-concat-string (str n)
+(defun jemdoc-mode-concat-string (str n)
   "Concatenate a string STR, N times."
   (let ((out-str))
     (while (> n 0)
@@ -401,7 +401,7 @@ registered in `font-lock-extend-region-functions'."
       (setq n (1- n)))
     out-str))
 
-(defun jemdoc-end-of-block (str n)
+(defun jemdoc-mode-end-of-block (str n)
   "Return position of next delimeter.
 
 Delimeters can be: empty line, end of buffer, or line starting with
@@ -410,14 +410,14 @@ STR appearing N or less times in a row."
     ;; find an empty line ("^$"), end of buffer ("\\'") or a line starting with 1, ..., n str
     (re-search-forward (let ((S "\\(\\'\\|^ *$"))
 			 (while (> n 0)
-			   (setq S (concat S (format "\\|^ *%s +" (jemdoc-concat-string str n))))
+			   (setq S (concat S (format "\\|^ *%s +" (jemdoc-mode-concat-string str n))))
 			   (setq n (1- n)))
 			 (setq S (concat S "\\)")))
 		       nil t)))
 
 
 
-(defun jemdoc-in-tilde-block-internal (tilde-block-type)
+(defun jemdoc-mode-in-tilde-block-internal (tilde-block-type)
   "Check whether point is inside a tilde block.
 
 If point is inside a tilde block with type TILDE-BLOCK-TYPE,
@@ -454,9 +454,9 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	  nil)
 	))))
 
-(defun jemdoc-ignore-region ()
+(defun jemdoc-mode-ignore-region ()
   "Assigne text property 'font-lock-ignore to code-blocks."
-  (let ((region (jemdoc-in-tilde-block-internal 'code-block)))
+  (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
     (when region
       (let ((start (save-excursion
 		     (goto-char (car region))
@@ -478,60 +478,60 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 
 
 
-(defvar jemdoc-font-lock-keywords
+(defvar jemdoc-mode-font-lock-keywords
   (list
 
    ;; ---------------------------------------------------------
 
-   '("^ *\\(-\\) +" (1 'jemdoc-face-bullet)
+   '("^ *\\(-\\) +" (1 'jemdoc-mode-face-bullet)
      ("^ *\\(--\\) +"
-      (jemdoc-end-of-block "-" 1)
+      (jemdoc-mode-end-of-block "-" 1)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
-   '("^ *\\(--\\) +" (1 'jemdoc-face-bullet-warning)
+   '("^ *\\(--\\) +" (1 'jemdoc-mode-face-bullet-warning)
      ("^ *\\(---\\) +"
-      (jemdoc-end-of-block "-" 2)
+      (jemdoc-mode-end-of-block "-" 2)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
-   '("^ *\\(---\\) +" (1 'jemdoc-face-bullet-warning)
+   '("^ *\\(---\\) +" (1 'jemdoc-mode-face-bullet-warning)
      ("^ *\\(----\\) +"
-      (jemdoc-end-of-block "-" 3)
+      (jemdoc-mode-end-of-block "-" 3)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
-   '("^ *\\(----\\) +" (1 'jemdoc-face-bullet-warning)
+   '("^ *\\(----\\) +" (1 'jemdoc-mode-face-bullet-warning)
      ("^ *\\(-----\\) +"
-      (jemdoc-end-of-block "-" 4)
+      (jemdoc-mode-end-of-block "-" 4)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
    ;; ---------------------------------------------------------
 
-   '("^ *\\(\\.\\) +" (1 'jemdoc-face-bullet)
+   '("^ *\\(\\.\\) +" (1 'jemdoc-mode-face-bullet)
      ("^ *\\(\\.\\.\\) +"
-      (jemdoc-end-of-block "\\." 1)
+      (jemdoc-mode-end-of-block "\\." 1)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
-   '("^ *\\(\\.\\.\\) +" (1 'jemdoc-face-bullet-warning)
+   '("^ *\\(\\.\\.\\) +" (1 'jemdoc-mode-face-bullet-warning)
      ("^ *\\(\\.\\.\\.\\) +"
-      (jemdoc-end-of-block "\\." 2)
+      (jemdoc-mode-end-of-block "\\." 2)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
-   '("^ *\\(\\.\\.\\.\\) +" (1 'jemdoc-face-bullet-warning)
+   '("^ *\\(\\.\\.\\.\\) +" (1 'jemdoc-mode-face-bullet-warning)
      ("^ *\\(\\.\\.\\.\\.\\) +"
-      (jemdoc-end-of-block "\\." 3)
+      (jemdoc-mode-end-of-block "\\." 3)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
-   '("^ *\\(\\.\\.\\.\\.\\) +" (1 'jemdoc-face-bullet-warning)
+   '("^ *\\(\\.\\.\\.\\.\\) +" (1 'jemdoc-mode-face-bullet-warning)
      ("^ *\\(\\.\\.\\.\\.\\.\\) +"
-      (jemdoc-end-of-block "\\." 4)
+      (jemdoc-mode-end-of-block "\\." 4)
       nil
-      (1 'jemdoc-face-bullet t)))
+      (1 'jemdoc-mode-face-bullet t)))
 
    ;; ---------------------------------------------------------
 
@@ -539,18 +539,18 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
    '("\`.*?\'"  . 'emdoc-face-other)
 
    ;; titles
-   '("^ *= +.*"    . 'jemdoc-face-title-1)
-   '("^ *== +.*"   . 'jemdoc-face-title-2)
-   '("^ *=== +.*"  . 'jemdoc-face-title-3)
-   '("^ *==== +.*" . 'jemdoc-face-title-4)
+   '("^ *= +.*"    . 'jemdoc-mode-face-title-1)
+   '("^ *== +.*"   . 'jemdoc-mode-face-title-2)
+   '("^ *=== +.*"  . 'jemdoc-mode-face-title-3)
+   '("^ *==== +.*" . 'jemdoc-mode-face-title-4)
 
    ;; ---------------------------------------------------------
 
    ;; definition
    '("^ *\\(: *{\\)\\(.*?\\)\\(}\\)"
-     (1 'jemdoc-face-special-keywords)  ;; : {
-     (2 'jemdoc-face-special-keywords-name)  ;; definition name
-     (3 'jemdoc-face-special-keywords)) ;; }
+     (1 'jemdoc-mode-face-special-keywords)  ;; : {
+     (2 'jemdoc-mode-face-special-keywords-name)  ;; definition name
+     (3 'jemdoc-mode-face-special-keywords)) ;; }
 
    ;; ---------------------------------------------------------
 
@@ -564,84 +564,84 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	   (minimal-match (zero-or-more not-newline))
 	   (not (any "\\"))
 	   "+"))
-      1 'jemdoc-face-monospace prepend)
+      1 'jemdoc-mode-face-monospace prepend)
 
    ;; bold
-   '("\\(?:^\\|[^\\]\\)\\(\\*.*?[^\\]\\*\\)"  1 'jemdoc-face-bold prepend)
+   '("\\(?:^\\|[^\\]\\)\\(\\*.*?[^\\]\\*\\)"  1 'jemdoc-mode-face-bold prepend)
 
    ;; italics
-   '("\\(?:^\\|[^\\]\\)\\(/.*?[^\\]/\\)"  1 'jemdoc-face-italics prepend)
+   '("\\(?:^\\|[^\\]\\)\\(/.*?[^\\]/\\)"  1 'jemdoc-mode-face-italics prepend)
 
    ;; tilde blocks
-   '("^~~~" . 'jemdoc-face-tilde-block-delimeters)
-   '(jemdoc-highlight-curly-brackets-tilde-block . 'jemdoc-face-tilde-block-delimeters)
+   '("^~~~" . 'jemdoc-mode-face-tilde-block-delimeters)
+   '(jemdoc-mode-highlight-curly-brackets-tilde-block . 'jemdoc-mode-face-tilde-block-delimeters)
 
    ;; {{html text}}
-   '(jemdoc-highlight-curly-brackets-html-text 0 'jemdoc-face-html-text t)
+   '(jemdoc-mode-highlight-curly-brackets-html-text 0 'jemdoc-mode-face-html-text t)
 
    ;; +{{monospace html text}}+ or %monospace html text%
-   '(jemdoc-highlight-monospace-html-text 0 'jemdoc-face-monospace-html t)
+   '(jemdoc-mode-highlight-monospace-html-text 0 'jemdoc-mode-face-monospace-html t)
 
    ;; inline $equations$
-   '("\\$.*?\\$" . 'jemdoc-face-equation)
+   '("\\$.*?\\$" . 'jemdoc-mode-face-equation)
 
    ;; \(equations\)
-   '("^ *\\\\(.*\\\\)" 0 'jemdoc-face-equation t)
+   '("^ *\\\\(.*\\\\)" 0 'jemdoc-mode-face-equation t)
 
    ;; [http/mail ...]
-   '("\\[\\(http\\|mail\\).*\\]" 0 'jemdoc-face-http-mail prepend)
+   '("\\[\\(http\\|mail\\).*\\]" 0 'jemdoc-mode-face-http-mail prepend)
 
    ;; syntax-table stuff
-   '(jemdoc-property-retrieve 0 'jemdoc-face-special-keywords t)
+   '(jemdoc-mode-property-retrieve 0 'jemdoc-mode-face-special-keywords t)
 
    ;; #include{...} and #includeraw{...}
    ;; since I use "t" as a third argument I can directly nest \\(.*?\\)
    ;; in the first group
    '("\\(?:^ *# *\\)\\(include\\(?:raw\\)?{\\(.*?\\)}\\)"
-     (1 'jemdoc-face-special-keywords t)
-     (2 'jemdoc-face-special-keywords-name t))
+     (1 'jemdoc-mode-face-special-keywords t)
+     (2 'jemdoc-mode-face-special-keywords-name t))
 
    ;; 2--3 different-sized dashes
    ;; I have to put this after the ^-, ^--, ^---, ...
-   '("[^-\\]\\(-\\{3,3\\}\\)[^-]" 1 'jemdoc-face-dashes-3)
-   '("[^-\\]\\(-\\{2,2\\}\\)[^-]" 1 'jemdoc-face-dashes-2)
+   '("[^-\\]\\(-\\{3,3\\}\\)[^-]" 1 'jemdoc-mode-face-dashes-3)
+   '("[^-\\]\\(-\\{2,2\\}\\)[^-]" 1 'jemdoc-mode-face-dashes-2)
 
    ;; ... ellipsis
    ;; I have to put this after the ^\\., ^\\.\\., ^\\.\\.\\., ...
-   '("[^-\\]\\(\\.\\{3,3\\}\\)[^-]" 1 'jemdoc-face-ellipsis)
+   '("[^-\\]\\(\\.\\{3,3\\}\\)[^-]" 1 'jemdoc-mode-face-ellipsis)
 
    ;; ---------------------------------------------------------
 
    ;; other
-   `(,(regexp-opt '("\\n" "\\A" "\\C" "\\R" "\\M" "\\\#" "\\`" "\\\'" "\\\"")) 0 'jemdoc-face-other)
+   `(,(regexp-opt '("\\n" "\\A" "\\C" "\\R" "\\M" "\\\#" "\\`" "\\\'" "\\\"")) 0 'jemdoc-mode-face-other)
 
    )
   "Keywords to highlight in jemdoc mode.")
-(make-local-variable 'jemdoc-font-lock-keywords)
+(make-local-variable 'jemdoc-mode-font-lock-keywords)
 
 
 
 ;;;###autoload
 (define-derived-mode jemdoc-mode prog-mode "jemdoc"
 		     "Major mode for editing jemdoc files."
-		     (setq-local syntax-propertize-function 'jemdoc-syntax-propertize-function)
-		     (setq-local font-lock-defaults '(jemdoc-font-lock-keywords
+		     (setq-local syntax-propertize-function 'jemdoc-mode-syntax-propertize-function)
+		     (setq-local font-lock-defaults '(jemdoc-mode-font-lock-keywords
 						      nil
 						      nil))
 		     ;; (setq-local font-lock-multiline t) ;; I don't need it
-		     (set-syntax-table jemdoc-font-lock-syntax-table)
+		     (set-syntax-table jemdoc-mode-font-lock-syntax-table)
 		     )
 
 
 
 (add-hook 'jemdoc-mode-hook
 	  (lambda ()
-	    (setq-local font-lock-extend-after-change-region-function 'jemdoc-extend-region-initialize)
-	    (add-hook 'font-lock-extend-region-functions 'jemdoc-extend-region)
+	    (setq-local font-lock-extend-after-change-region-function 'jemdoc-mode-extend-region-initialize)
+	    (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
 
 	    ;; sometimes the region used in jit-lock doesn't contain the whole block
 	    ;; so I prefer to not use it
-	    (setq-local font-lock-support-mode jemdoc-font-lock-support-mode)
+	    (setq-local font-lock-support-mode jemdoc-mode-font-lock-support-mode)
 
 	    ;; used to not fontify code blocks
 	    ;; (see the font-lock-ignore text property)
