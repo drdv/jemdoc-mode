@@ -631,7 +631,7 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 						      (syntax-propertize-function .
 						       jemdoc-mode-syntax-propertize-function)
 						      (font-lock-extend-after-change-region-function .
-						       'jemdoc-mode-extend-region-initialize)
+						       jemdoc-mode-extend-region-initialize)
 						      ;; sometimes the region used in jit-lock
 						      ;; doesn't contain the whole block so I
 						      ;; prefer to not use it by default
@@ -640,7 +640,6 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 						      ))
 		     (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
 		     (set-syntax-table jemdoc-mode-font-lock-syntax-table)
-
 		     ;; I don't need (setq-local font-lock-multiline t)
 		     )
 
