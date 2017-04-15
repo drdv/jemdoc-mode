@@ -167,8 +167,7 @@ or #include{name of file}."
 
 (defvar jemdoc-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; define your key bindings
-    ;;(define-key map (kbd ...) '...)
+    (define-key map (kbd "C-x n r") 'jemdoc-narrow-to-code-block)
     map)
   "Keymap for jemdoc major mode.")
 (make-local-variable 'jemdoc-mode-map)
@@ -457,29 +456,25 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 
 (defun jemdoc-ignore-region ()
   "Assigne text property 'font-lock-ignore to code-blocks."
-  (interactive)
-  (let ((region (jemdoc-in-tilde-block-internal 'code-block))
-	start
-	end)
+  (let ((region (jemdoc-in-tilde-block-internal 'code-block)))
     (when region
-
-      ;; leave the highlightling of the oppening ~~~\n{}{...}
-      (setq start (save-excursion
-		    (goto-char (car region))
-		    (line-beginning-position 3)))
-
-      ;; leave the highlightling of the closing ~~~
-      (setq end (save-excursion
-		  (goto-char (cdr region))
-		  (line-end-position 0)))
-      (put-text-property start end  'font-lock-ignore t)
-      (remove-text-properties start end '(face nil))
-
-      ;; move point after the block
-      (goto-char (save-excursion
+      (let ((start (save-excursion
+		     (goto-char (car region))
+		     ;; leave the highlightling of the oppening ~~~\n{...}{...}
+		     (line-beginning-position 3)))
+	    (end (save-excursion
 		   (goto-char (cdr region))
-		   (line-beginning-position 2)))
-      )))
+		   ;; leave the highlightling of the closing ~~~
+		   (line-end-position 0))))
+
+	(put-text-property start end  'font-lock-ignore t)
+	(remove-text-properties start end '(face nil))
+
+	;; move point after the block
+	(goto-char (save-excursion
+		     (goto-char (cdr region))
+		     (line-beginning-position 2)))
+	))))
 
 
 
