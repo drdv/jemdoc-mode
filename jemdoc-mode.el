@@ -624,27 +624,31 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 ;;;###autoload
 (define-derived-mode jemdoc-mode prog-mode "jemdoc"
 		     "Major mode for editing jemdoc files."
-		     (setq-local syntax-propertize-function 'jemdoc-mode-syntax-propertize-function)
-		     (setq-local font-lock-defaults '(jemdoc-mode-font-lock-keywords
-						      nil
-						      nil))
-		     ;; (setq-local font-lock-multiline t) ;; I don't need it
+		     (setq-local font-lock-defaults '(jemdoc-mode-font-lock-keywords ;; KEYWORDS
+						      nil                            ;; KEYWORDS-ONLY
+						      nil                            ;; CASE-FOLD
+						      nil                            ;; SYNTAX-ALIST
+						      (syntax-propertize-function .
+						       jemdoc-mode-syntax-propertize-function)
+						      (font-lock-extend-after-change-region-function .
+						       'jemdoc-mode-extend-region-initialize)
+						      ;; sometimes the region used in jit-lock
+						      ;; doesn't contain the whole block so I
+						      ;; prefer to not use it by default
+						      (font-lock-support-mode .
+						       jemdoc-mode-font-lock-support-mode)
+						      ))
+		     (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
 		     (set-syntax-table jemdoc-mode-font-lock-syntax-table)
+
+		     ;; I don't need (setq-local font-lock-multiline t)
 		     )
 
 
 
 (add-hook 'jemdoc-mode-hook
 	  (lambda ()
-	    (setq-local font-lock-extend-after-change-region-function 'jemdoc-mode-extend-region-initialize)
-	    (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
-
-	    ;; sometimes the region used in jit-lock doesn't contain the whole block
-	    ;; so I prefer to not use it
-	    (setq-local font-lock-support-mode jemdoc-mode-font-lock-support-mode)
-
-	    ;; used to not fontify code blocks
-	    ;; (see the font-lock-ignore text property)
+	    ;; used to not fontify code blocks (see the font-lock-ignore text property)
 	    (when (package-installed-p 'font-lock+)
 	      (require 'font-lock+))
 	    ))
