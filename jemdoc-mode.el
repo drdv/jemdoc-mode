@@ -236,8 +236,8 @@ Text properties:
   (let* ((beg (match-beginning 0))
 	 (str-line (thing-at-point 'line t))
 	 (jemdoc-mode-line-start-p (if (> (length str-line) 9)
-				  (equal (substring str-line 0 9) "# jemdoc:")
-				nil))
+				       (equal (substring str-line 0 9) "# jemdoc:")
+				     nil))
 	 (context (save-excursion
 		    (save-match-data (syntax-ppss beg)))))
     (when jemdoc-mode-line-start-p
