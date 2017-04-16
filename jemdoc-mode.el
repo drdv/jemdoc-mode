@@ -478,6 +478,75 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 
 
 
+;; Below I tried to narrow to a block and then change the major mode but
+;; this doesn't work because the parts not within the narrowed region
+;; interfere with the fontification. For example, if we narrow only to
+;; lines 2,3,4,5 the code in the narrowed region would be fontified as
+;; if it is in a comment
+;;
+;; 1. /*
+;; 2. int f(int a)
+;; 3. {
+;; 4.     cout << "test" << "\n";
+;; 5. }
+;; 6. */
+;;
+;; I don't know why this happens. If I check (syntax-ppss POINT) in the
+;; narrowed region, the parser state shows that we are not in a comment!
+;; I tried setting `font-lock-dont-widen' to non-nil - no effect.
+
+;; Maybe I should do something as in
+;; https://github.com/aaronbieber/fence-edit.el where the block is simply
+;; copied in a new buffer, the appropriate major mode is set and after
+;; editing, the code can be inserted back in the original buffer.
+;;
+;; todo: maybe I can use directly mmm-mode ...
+
+;; I leave this code for reference (who knows, maybe someone would find a
+;; cool trick to make it work)
+(defun jemdoc-mode-narrow-to-code-block ()
+  "Narrow to containing code block."
+  (interactive)
+  (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
+    (if region
+	(let ((start (save-excursion
+		       (goto-char (car region))
+		       ;; skip the oppening ~~~\n{...}{...}
+		       (line-beginning-position 3)))
+	      (end (save-excursion
+		     (goto-char (cdr region))
+		     ;; skip the closing ~~~
+		     (line-end-position 0)))
+	      ;; detect the programming language (specified in the second {})
+	      (lang (save-excursion
+		      (re-search-backward "^ *{.*?}{\\(.*?\\)}")
+		      (substring-no-properties (match-string 1)))))
+	  (narrow-to-region start end)
+	  (message "lang = %s" lang)
+	  (cond
+	    ((equal lang "lisp")
+	     (emacs-lisp-mode)
+	     (remove-text-properties start end '(font-lock-ignore t)))
+	    ((or (equal lang "python")
+		 (equal lang "py"))
+	     (python-mode)
+	     (remove-text-properties start end '(font-lock-ignore t)))
+	    ((or (equal lang "c++")
+		 (equal lang "cpp"))
+	     (c++-mode)
+	     (remove-text-properties start end '(font-lock-ignore t))
+	     )
+	    ))
+      (message "warning: not in code block"))
+    ))
+
+(defun jemdoc-mode-widen ()
+  (interactive)
+  (widen)
+  (jemdoc-mode))
+
+
+
 (defvar jemdoc-mode-font-lock-keywords
   (list
 
