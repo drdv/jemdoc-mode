@@ -7,7 +7,7 @@
 #### Via MELPA (recommended)
 
 If you have a recent version of `package.el` you can install `jemdoc-mode` from
-the [MELPA](http://melpa.org) package repository.
+the [MELPA](http://melpa.org) package repository (pull request awaiting merging).
 
 #### Manually
 
@@ -24,3 +24,7 @@ to your `~/.emacs` or `~/.emacs.d/init.el`.
 
 2. If `font-lock+` is installed, it is used to ignore (i.e., not fortify) code-block regions
    (i.e., tilde blocks with `{...}{...}` arguments)
+
+3. There is a simple option for editing code-blocks with proper syntax highlighting in an "edit-buffer".
+   (see `jemdoc-mode-edit-code-block`, and the associated keybinding `C-x n r`).
+   The edited text can be inserted back in the jemdoc buffer (using a menu at the top of the "edit-buffer").
