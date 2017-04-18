@@ -167,7 +167,7 @@ or #include{name of file}."
 
 (defvar jemdoc-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x n r") 'jemdoc-mode-narrow-to-code-block)
+    (define-key map (kbd "C-x n r") 'jemdoc-mode-edit-code-block)
     map)
   "Keymap for jemdoc major mode.")
 (make-local-variable 'jemdoc-mode-map)
@@ -505,7 +505,9 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 ;; I leave this code for reference (who knows, maybe someone would find a
 ;; cool trick to make it work)
 (defun jemdoc-mode-narrow-to-code-block ()
-  "Narrow to containing code block."
+  "Narrow to containing code block and change the major mode.
+The major mode is determined from the content of the second {}
+in the code-block arguments."
   (interactive)
   (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
     (if region
@@ -540,10 +542,118 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
       (message "warning: not in code block"))
     ))
 
-(defun jemdoc-mode-widen ()
+
+
+;; Here I am adopting/stealing the approach from github.com/aaronbieber/fence-edit.el
+;; see as well the discussion in
+;; https://www.reddit.com/r/emacs/comments/42yi77/any_solution_for_editing_a_region_in_a_different/
+
+(defvar jemdoc-mode-lang-mode-alist
+  '(("lisp"   . "emacs-lisp-mode")
+    ("elisp"  . "emacs-lisp-mode")
+    ("c++"    . "c++-mode")
+    ("cpp"    . "c++-mode")
+    ("python" . "python-mode")
+    ("py"     . "python-mode"))
+  "Association between programming language specifier and major-mode.")
+(make-local-variable 'jemdoc-mode-lang-mode-alist)
+
+(defvar jemdoc-mode-code-block-beg nil
+  "Mark (in jemdoc buffer) for beginning of region to edit.")
+(make-local-variable 'jemdoc-mode-code-block-beg)
+
+(defvar jemdoc-mode-code-block-end nil
+  "Mark (in jemdoc buffer) for end of region to edit.")
+(make-local-variable 'jemdoc-mode-code-block-end)
+
+(defvar jemdoc-mode-edit-preamble-length nil
+  "Length of preamble when editting code-blocks.
+This is the number of characters used for the menu before the code.")
+(make-local-variable 'jemdoc-mode-edit-preamble-length)
+
+(defvar jemdoc-mode-edit-abort-button nil
+  "Position of abort button in the preamble when editting code-blocks.")
+(make-local-variable 'jemdoc-mode-edit-abort-button)
+
+(define-button-type 'jemdoc-mode-insert-button
+    'action 'jemdoc-mode-edit-code-block-insert-back
+    'follow-link t)
+
+(define-button-type 'jemdoc-mode-abort-button
+    'action 'jemdoc-mode-edit-code-block-abort
+    'follow-link t)
+
+(defun jemdoc-mode-edit-code-block ()
   (interactive)
-  (widen)
-  (jemdoc-mode))
+  (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
+    (if region
+	(let* ((m-beg (set-marker (make-marker) (save-excursion
+						  (goto-char (car region))
+						  ;; skip the oppening ~~~\n{...}{...}
+						  (line-beginning-position 3))))
+	       (m-end (set-marker (make-marker) (save-excursion
+						  (goto-char (cdr region))
+						  ;; skip the closing ~~~
+						  (line-end-position 0))))
+	       (lang (save-excursion
+		       (re-search-backward "^ *{.*?}{\\(.*?\\)}")
+		       (substring-no-properties (match-string 1))))
+	       (code (buffer-substring-no-properties m-beg m-end))
+	       (mode (cdr (assoc lang jemdoc-mode-lang-mode-alist)))
+	       ;;(ovl (make-overlay m-beg m-end))
+	       (edit-buffer (generate-new-buffer
+			     (concat "jemdoc-code-block:" (buffer-name) "[" lang "]"))))
+	  ;; (switch-to-buffer-other-window edit-buffer t)
+	  (switch-to-buffer edit-buffer t)
+	  ;;(overlay-put ovl 'face 'secondary-selection)
+	  (insert "← [insert]\n") ;;  1:11
+	  (insert "× [abort]\n")  ;; 12:21
+	  (insert "\^L\n")        ;; 22:23
+	  (setq jemdoc-mode-edit-abort-button 12
+		jemdoc-mode-edit-preamble-length 23)
+	  (put-text-property (point-min) jemdoc-mode-edit-preamble-length 'read-only t)
+	  (make-button 1
+		       (1- jemdoc-mode-edit-abort-button)
+		       :type 'jemdoc-mode-insert-button)
+	  (make-button jemdoc-mode-edit-abort-button
+		       (- jemdoc-mode-edit-preamble-length 2)
+		       :type 'jemdoc-mode-abort-button)
+	  (insert code)
+	  (condition-case e
+	      (funcall (intern mode))
+	    (error
+	     (message "warning: major mode `%s' fails with: %s" mode e)))
+	  ;; `header-line-format' automatically becomes buffer-local when set
+	  ;; (setq header-line-format (concat lang " code-block"))
+	  (goto-char jemdoc-mode-edit-abort-button)
+	  (setq jemdoc-mode-code-block-beg m-beg
+		jemdoc-mode-code-block-end m-end)
+	  )
+      (message "warning: not in code-block"))))
+
+(defun jemdoc-mode-edit-code-block-insert-back (button)
+  (let ((buffer (current-buffer))
+        (code (buffer-substring-no-properties (1+ jemdoc-mode-edit-preamble-length)
+					      (point-max))))
+
+    (switch-to-buffer-other-window (marker-buffer jemdoc-mode-code-block-beg))
+    (delete-other-windows)
+    (kill-buffer buffer)
+    (delete-region jemdoc-mode-code-block-beg
+		   jemdoc-mode-code-block-end)
+    (insert code)
+    (goto-char jemdoc-mode-code-block-beg)
+    (set-marker jemdoc-mode-code-block-beg nil)
+    (set-marker jemdoc-mode-code-block-end nil)))
+
+(defun jemdoc-mode-edit-code-block-abort (button)
+  (let ((buffer (current-buffer)))
+    (switch-to-buffer-other-window (marker-buffer jemdoc-mode-code-block-beg))
+    (delete-other-windows)
+    (kill-buffer buffer)
+    (set-marker jemdoc-mode-code-block-beg nil)
+    (set-marker jemdoc-mode-code-block-end nil))
+  )
 
 
 
