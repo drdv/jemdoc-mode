@@ -246,7 +246,7 @@ Text properties:
 			 (cons (nth 4 context) (match-data))))))
 
 (defun jemdoc-mode-property-retrieve (limit)
-  "Highlight text with jemdoc-keywords-in-comments-property until LIMIT."
+  "Highlight text with jemdoc-keywords-in-comments-property (until LIMIT)."
   (let ((pos (next-single-char-property-change (point)
 					       'jemdoc-keywords-in-comments-property
                                                nil limit)))
@@ -555,7 +555,7 @@ in the code-block arguments."
     ("cpp"    . "c++-mode")
     ("python" . "python-mode")
     ("py"     . "python-mode"))
-  "Association between programming language specifier and major-mode.")
+  "Association between programming language specifier and major mode.")
 (make-local-variable 'jemdoc-mode-lang-mode-alist)
 
 (defvar jemdoc-mode-code-block-beg nil
@@ -575,6 +575,10 @@ This is the number of characters used for the menu before the code.")
   "Position of abort button in the preamble when editting code-blocks.")
 (make-local-variable 'jemdoc-mode-edit-abort-button)
 
+(defvar jemdoc-mode-edit-code-block-buffer-name "*edit-code-block*"
+  "Name of the buffer where we edit code-blocks.")
+(make-local-variable 'jemdoc-mode-edit-code-block-buffer-name)
+
 (define-button-type 'jemdoc-mode-insert-button
     'action 'jemdoc-mode-edit-code-block-insert-back
     'follow-link t)
@@ -584,6 +588,9 @@ This is the number of characters used for the menu before the code.")
     'follow-link t)
 
 (defun jemdoc-mode-edit-code-block ()
+  "Edit a code-block in new buffer (appropriate major mode is activated).
+The major mode is determined by the content of the second {} in the
+arguments of the code-block."
   (interactive)
   (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
     (if region
@@ -601,8 +608,11 @@ This is the number of characters used for the menu before the code.")
 	       (code (buffer-substring-no-properties m-beg m-end))
 	       (mode (cdr (assoc lang jemdoc-mode-lang-mode-alist)))
 	       ;;(ovl (make-overlay m-beg m-end))
-	       (edit-buffer (generate-new-buffer
-			     (concat "jemdoc-code-block:" (buffer-name) "[" lang "]"))))
+	       (edit-buffer (progn
+			      ;; make sure that there is only one code-block editor buffer
+			      (when (get-buffer jemdoc-mode-edit-code-block-buffer-name)
+				(kill-buffer jemdoc-mode-edit-code-block-buffer-name))
+			      (generate-new-buffer jemdoc-mode-edit-code-block-buffer-name))))
 	  ;; (switch-to-buffer-other-window edit-buffer t)
 	  (switch-to-buffer edit-buffer t)
 	  ;;(overlay-put ovl 'face 'secondary-selection)
@@ -622,16 +632,23 @@ This is the number of characters used for the menu before the code.")
 	  (condition-case e
 	      (funcall (intern mode))
 	    (error
-	     (message "warning: major mode `%s' fails with: %s" mode e)))
-	  ;; `header-line-format' automatically becomes buffer-local when set
-	  ;; (setq header-line-format (concat lang " code-block"))
+	     (message "warning: major mode `%s' fails with: %s" mode e)
+	     (fundamental-mode)))
+	  ;; note: `header-line-format' automatically becomes buffer-local when set
+	  (setq header-line-format (concat "jemdoc-code-block-editor [" mode "]: "
+					   (format "region (%d,%d) in %s"
+						   (marker-position m-beg)
+						   (marker-position m-end)
+						   (marker-buffer m-beg))))
 	  (goto-char jemdoc-mode-edit-abort-button)
 	  (setq jemdoc-mode-code-block-beg m-beg
-		jemdoc-mode-code-block-end m-end)
-	  )
+		jemdoc-mode-code-block-end m-end))
       (message "warning: not in code-block"))))
 
 (defun jemdoc-mode-edit-code-block-insert-back (button)
+  "Insert edited code-block back in the jemdoc buffer.
+BUTTON is the standard input given to functions registerd in the
+`action' property of `define-button-type'."
   (let ((buffer (current-buffer))
         (code (buffer-substring-no-properties (1+ jemdoc-mode-edit-preamble-length)
 					      (point-max))))
@@ -646,6 +663,9 @@ This is the number of characters used for the menu before the code.")
     (set-marker jemdoc-mode-code-block-end nil)))
 
 (defun jemdoc-mode-edit-code-block-abort (button)
+  "Abort code-block editing.
+BUTTON is the standard input given to functions registerd in the
+`action' property of `define-button-type'."
   (let ((buffer (current-buffer)))
     (switch-to-buffer (marker-buffer jemdoc-mode-code-block-beg))
     (kill-buffer buffer)
