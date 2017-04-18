@@ -25,6 +25,6 @@ to your `~/.emacs` or `~/.emacs.d/init.el`.
 2. If `font-lock+` is installed, it is used to ignore (i.e., not fortify) code-block regions
    (i.e., tilde blocks with `{...}{...}` arguments)
 
-3. There is a simple option for editing code-blocks with proper syntax highlighting in an "edit-buffer".
+3. There is a simple option for editing code-blocks with proper syntax highlighting in an "edit-buffer"
    (see `jemdoc-mode-edit-code-block`, and the associated keybinding `C-x n r`).
    The edited text can be inserted back in the jemdoc buffer (using a menu at the top of the "edit-buffer").
