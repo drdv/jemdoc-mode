@@ -847,6 +847,8 @@ BUTTON is the standard input given to functions registerd in the
 						      ;; prefer to not use it by default
 						      (font-lock-support-mode .
 						       jemdoc-mode-font-lock-support-mode)
+						      ;; required to use M-;
+						      (comment-start . "#")
 						      ))
 		     (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
 		     (set-syntax-table jemdoc-mode-font-lock-syntax-table)
