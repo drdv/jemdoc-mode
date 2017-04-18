@@ -716,10 +716,10 @@ This is the number of characters used for the menu before the code.")
    '("\`.*?\'"  . 'emdoc-face-other)
 
    ;; titles
-   '("^ *= +.*"    . 'jemdoc-mode-face-title-1)
-   '("^ *== +.*"   . 'jemdoc-mode-face-title-2)
-   '("^ *=== +.*"  . 'jemdoc-mode-face-title-3)
-   '("^ *==== +.*" . 'jemdoc-mode-face-title-4)
+   '("^ *= +.*"    0 'jemdoc-mode-face-title-1 t)
+   '("^ *== +.*"   0 'jemdoc-mode-face-title-2 t)
+   '("^ *=== +.*"  0 'jemdoc-mode-face-title-3 t)
+   '("^ *==== +.*" 0 'jemdoc-mode-face-title-4 t)
 
    ;; ---------------------------------------------------------
 
@@ -765,8 +765,8 @@ This is the number of characters used for the menu before the code.")
    ;; \(equations\)
    '("^ *\\\\(.*\\\\)" 0 'jemdoc-mode-face-equation t)
 
-   ;; [http/mail ...]
-   '("\\[\\(http\\|mail\\).*\\]" 0 'jemdoc-mode-face-http-mail prepend)
+   ;; [http/mail/files ...]
+   '("\\[\\(http\\|mail\\|\\./\\|/\\).*\\]" 0 'jemdoc-mode-face-http-mail prepend)
 
    ;; syntax-table stuff
    '(jemdoc-mode-property-retrieve 0 'jemdoc-mode-face-special-keywords t)
