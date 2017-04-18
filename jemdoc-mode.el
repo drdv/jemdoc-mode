@@ -262,10 +262,9 @@ Text properties:
 
 
 (defun jemdoc-mode-highlight-curly-brackets-tilde-block (limit)
-  "Highlight curly brackets in the preamble of a tilde block (until LIMIT).
-
-- pictures format is handled using: {}{.*?}{.*?}{.*?}{.*?}{.*?}{.*?}."
-  (when (re-search-forward "^ *\\({}{.*?}{.*?}{.*?}{.*?}{.*?}{.*?}\\|{.*?} *{.*?}\\|{.*?}\\)" limit t)
+  "Highlight curly brackets in the preamble of a tilde block (until LIMIT)."
+  ;; search for {}x1 or {}x2 or {}x7
+  (when (re-search-forward "^ *\\(\\({[^}{]*} *\\)\\{1,2\\}\\|\\({[^}{]*} *\\)\\{7,7\\}\\)$" limit t)
     (save-excursion
       (save-match-data
 	(goto-char (line-beginning-position 0))
@@ -428,9 +427,9 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
     (let ((p (point))
 	  (regexp (if (eq tilde-block-type 'code-block)
 		      ;; code block
-		      "^ *{.*?} *{.*?} *$"
+		      "^ *\\({[^}{]*} *\\)\\{2,2\\}$"
 		    ;; general-block
-		    "^ *\\({}{.*?}{.*?}{.*?}{.*?}{.*?}{.*?}\\|{.*?} *{.*?}\\|{.*?}\\)"))
+		    "^ *\\(\\({[^}{]*} *\\)\\{1,2\\}\\|\\({[^}{]*} *\\)\\{7,7\\}\\)$"))
 	  beg
 	  end)
       (catch 'drdv-return
@@ -460,7 +459,7 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
     (when region
       (let ((start (save-excursion
 		     (goto-char (car region))
-		     ;; leave the highlightling of the oppening ~~~\n{...}{...}
+		     ;; leave the highlightling of the oppening ~~~\n{}{}
 		     (line-beginning-position 3)))
 	    (end (save-excursion
 		   (goto-char (cdr region))
@@ -513,7 +512,7 @@ in the code-block arguments."
     (if region
 	(let ((start (save-excursion
 		       (goto-char (car region))
-		       ;; skip the oppening ~~~\n{...}{...}
+		       ;; skip the oppening ~~~\n{}{}
 		       (line-beginning-position 3)))
 	      (end (save-excursion
 		     (goto-char (cdr region))
@@ -521,8 +520,12 @@ in the code-block arguments."
 		     (line-end-position 0)))
 	      ;; detect the programming language (specified in the second {})
 	      (lang (save-excursion
-		      (re-search-backward "^ *{.*?}{\\(.*?\\)}")
-		      (substring-no-properties (match-string 1)))))
+		       ;; first, go to the end of the code-block
+		       ;; useful when point is in the arguments of the code-block
+		       (re-search-forward "^ *~~~ *$")
+		       ;; here we are sure that we are in a code block
+		       (re-search-backward "^ *~~~ *\n *{.*?} *{\\(.*?\\)}")
+		       (substring-no-properties (match-string 1)))))
 	  (narrow-to-region start end)
 	  (message "lang = %s" lang)
 	  (cond
@@ -603,7 +606,11 @@ arguments of the code-block."
 						  ;; skip the closing ~~~
 						  (line-end-position 0))))
 	       (lang (save-excursion
-		       (re-search-backward "^ *{.*?}{\\(.*?\\)}")
+		       ;; first, go to the end of the code-block
+		       ;; useful when point is in the arguments of the code-block
+		       (re-search-forward "^ *~~~ *$")
+		       ;; here we are sure that we are in a code block
+		       (re-search-backward "^ *~~~ *\n *{.*?} *{\\(.*?\\)}")
 		       (substring-no-properties (match-string 1))))
 	       (code (buffer-substring-no-properties m-beg m-end))
 	       (mode (cdr (assoc lang jemdoc-mode-lang-mode-alist)))
