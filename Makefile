@@ -2,8 +2,6 @@ EMACS=emacs
 PACKAGE-NAME=jemdoc-mode.el
 INIT_PACKAGE_EL="(progn (require 'package) (package-initialize))"
 
-#FIXME: to use cask ...
-
 all: build
 
 checkdoc:
@@ -20,7 +18,9 @@ package-lint:
 build: checkdoc package-lint
 	$(EMACS) -Q --batch \
 	--eval ${INIT_PACKAGE_EL} \
-	--eval '(byte-compile-file "${PACKAGE-NAME}")'
+	--eval "(progn \
+	           (setq byte-compile-error-on-warn t)  \
+	           (batch-byte-compile))" ${PACKAGE-NAME}
 
 clean :
 	@rm -f *.elc
