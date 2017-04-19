@@ -194,13 +194,9 @@ After each font-lock iteration, it is set back to nil in
   "Specify the support mode for jemdoc.")
 (make-local-variable 'jemdoc-mode-font-lock-support-mode)
 
-(defvar font-lock-beg nil
-  "To suppress warning during byte-compilation.")
-(make-local-variable 'font-lock-beg)
-
-(defvar font-lock-end nil
-  "To suppress warning during byte-compilation.")
-(make-local-variable 'font-lock-end)
+;; To suppress warnings during byte-compilation.
+(defvar font-lock-beg)
+(defvar font-lock-end)
 
 
 
