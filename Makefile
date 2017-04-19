@@ -25,4 +25,4 @@ build: checkdoc package-lint
 clean :
 	@rm -f *.elc
 
-.PHONY:	package-lint clean build
+.PHONY:	package-lint clean build checkdoc all
