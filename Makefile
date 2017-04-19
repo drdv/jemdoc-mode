@@ -1,6 +1,9 @@
 EMACS=emacs
+CASK=cask
 PACKAGE-NAME=jemdoc-mode.el
-INIT_PACKAGE_EL="(progn (require 'package) (package-initialize))"
+
+# 1. make cask
+# 2. make
 
 all: build
 
@@ -8,21 +11,24 @@ checkdoc:
 	@$(EMACS) -Q --batch -f "checkdoc" ${PACKAGE-NAME}
 
 package-lint:
-	@echo "checking with package-lint.el ..."
-	@$(EMACS) -Q --batch \
-	--eval ${INIT_PACKAGE_EL} \
-	-l "package-lint.el" \
+	${CASK} exec $(EMACS) -Q --batch -l "package-lint.el" \
 	-f "package-lint-batch-and-exit" ${PACKAGE-NAME}
-	@echo "done \n"
 
 build: checkdoc package-lint
-	$(EMACS) -Q --batch \
-	--eval ${INIT_PACKAGE_EL} \
+	${CASK} exec  $(EMACS) -Q --batch \
+	--eval "(require 'package)" \
 	--eval "(progn \
 	           (setq byte-compile-error-on-warn t)  \
 	           (batch-byte-compile))" ${PACKAGE-NAME}
 
+# I need to --eval (require 'package) for package-installed-p
+# which is used to check whether font-lock+ is installed
+
+cask:
+	${CASK} install
+
 clean :
 	@rm -f *.elc
+	@rm -rf .cask
 
-.PHONY:	package-lint clean build checkdoc all
+.PHONY:	all checkdoc package-lint build cask clean
