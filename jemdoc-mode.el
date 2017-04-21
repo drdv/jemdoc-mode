@@ -848,17 +848,12 @@ BUTTON is the standard input given to functions registerd in the
 						      ))
 		     (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
 		     (set-syntax-table jemdoc-mode-font-lock-syntax-table)
+		     (when (package-installed-p 'font-lock+)
+		       (require 'font-lock+))
 		     ;; I don't need (setq-local font-lock-multiline t)
 		     )
 
 
-
-(add-hook 'jemdoc-mode-hook
-	  (lambda ()
-	    ;; used to not fontify code blocks (see the font-lock-ignore text property)
-	    (when (package-installed-p 'font-lock+)
-	      (require 'font-lock+))
-	    ))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.jemdoc\\'" . jemdoc-mode))
