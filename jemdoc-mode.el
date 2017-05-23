@@ -20,7 +20,7 @@
 ;; GNU Emacs 25.1.1 (x86_64-apple-darwin16.1.0)
 ;;
 ;; jemdoc is a light text-based markup language designed
-;; for creating websites. For more information see
+;; for creating websites.  For more information see
 ;; http://jemdoc.jaboc.net
 
 ;; Quick start:
@@ -44,6 +44,9 @@
 ;; {optional block name}{optional programming language name}
 
 
+
+(defgroup jemdoc-mode-faces nil
+  "Jemdoc-mode related phases.")
 
 (defface jemdoc-mode-face-monospace
     '((t . (:inherit font-lock-type-face)))
@@ -275,13 +278,11 @@ Text properties:
   "Highlight monospace html text (until LIMIT).
 
 There are two formats: +{{format 1}}+ and %format 2%."
-  (when (re-search-forward "\\(\\+{{.*?}}\\+\\|%.*?%\\)" limit t)
-    t))
+  (re-search-forward "\\(\\+{{.*?}}\\+\\|%.*?%\\)" limit t))
 
 (defun jemdoc-mode-highlight-curly-brackets-html-text (limit)
   "Highlight curly brackets with html text (until LIMIT)."
-  (when (re-search-forward "{{.*?}}" limit t)
-    t))
+  (re-search-forward "{{.*?}}" limit t))
 
 
 
@@ -290,10 +291,10 @@ There are two formats: +{{format 1}}+ and %format 2%."
 
 This function is called in `jemdoc-mode-extend-region' which is registered
 in `font-lock-extend-region-functions' and is called by font-lock during
-fontification. The variables `font-lock-beg' and `font-lock-end' in the code
+fontification.  The variables `font-lock-beg' and `font-lock-end' in the code
 refer to dynamically bound variables used by font-lock."
-  (let ((region-beg)
-	(region-end))
+  (let (region-beg
+	region-end)
     (save-excursion
       (goto-char font-lock-beg)
       (setq region-beg (jemdoc-mode-in-tilde-block-internal 'general-block)))
@@ -305,15 +306,14 @@ refer to dynamically bound variables used by font-lock."
       (setq font-lock-beg (car region-beg)))
     (when (and region-end
 	       (> (cdr region-end) font-lock-end)) ;; don't shorten the region
-      (setq font-lock-end (cdr region-end)))
-    ))
+      (setq font-lock-end (cdr region-end)))))
 
 (defun jemdoc-mode-extend-bullet-region ()
   "Extend region to contain encolsing bullet block.
 
 This function is called in `jemdoc-mode-extend-region' which is registered
 in `font-lock-extend-region-functions' and is called by font-lock during
-fontification. The variables `font-lock-beg' and `font-lock-end' in the code
+fontification.  The variables `font-lock-beg' and `font-lock-end' in the code
 refer to dynamically bound variables used by font-lock."
   (save-excursion
     (when jemdoc-mode-debug-messages
@@ -416,7 +416,7 @@ STR appearing N or less times in a row."
   "Check whether point is inside a tilde block.
 
 If point is inside a tilde block with type TILDE-BLOCK-TYPE,
-return a cell array with its beginning and end. If not, return nil.
+return a cell array with its beginning and end.  If not, return nil.
 
 TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
   (save-excursion
@@ -468,8 +468,7 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	;; move point after the block
 	(goto-char (save-excursion
 		     (goto-char (cdr region))
-		     (line-beginning-position 2)))
-	))))
+		     (line-beginning-position 2)))))))
 
 
 
@@ -538,8 +537,7 @@ in the code-block arguments."
 	     (remove-text-properties start end '(font-lock-ignore t))
 	     )
 	    ))
-      (message "warning: not in code block"))
-    ))
+      (message "warning: not in code block"))))
 
 
 
@@ -679,8 +677,7 @@ BUTTON is the standard input given to functions registerd in the
     (switch-to-buffer (marker-buffer jemdoc-mode-code-block-beg))
     (kill-buffer buffer)
     (set-marker jemdoc-mode-code-block-beg nil)
-    (set-marker jemdoc-mode-code-block-end nil))
-  )
+    (set-marker jemdoc-mode-code-block-end nil)))
 
 
 
