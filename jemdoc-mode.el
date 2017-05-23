@@ -49,116 +49,105 @@
   "Jemdoc-mode related phases.")
 
 (defface jemdoc-mode-face-monospace
-    '((t . (:inherit font-lock-type-face)))
+  '((t . (:inherit font-lock-type-face)))
   "Face for +monospace+."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-bold
-    '((t . (:inherit 'bold)))
+  '((t . (:inherit 'bold)))
   "Face for *bold*."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-italics
-    '((t . (:inherit 'shadow)))
+  '((t . (:inherit 'shadow)))
   "Face for /italics/."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-tilde-block-delimeters
-    '((t . (:inherit 'success)))
+  '((t . (:inherit 'success)))
   "Face for tilde block delimeters."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-equation
-    '((t . (:inherit font-lock-keyword-face)))
+  '((t . (:inherit font-lock-keyword-face)))
   "Face for $inline equation$ or \(equation\)."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-special-keywords
-    '((t . (:inherit font-lock-variable-name-face)))
+  '((t . (:inherit font-lock-variable-name-face)))
   "Face for special keywords.
 For example, keywords in comments or the definition construct : {}."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-special-keywords-name
-    '((t . (:inherit font-lock-function-name-face)))
+  '((t . (:inherit font-lock-function-name-face)))
   "Face for names in special keywords.
 For example the definition construct : {A name}
 or #include{name of file}."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-monospace-html
-    '((t . (:inherit font-lock-function-name-face)))
+  '((t . (:inherit font-lock-function-name-face)))
   "Face for +{{monospace html}}+ which is equivalent to %monospace html%."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-other
-    '((t . (:inherit font-lock-constant-face)))
+  '((t . (:inherit font-lock-constant-face)))
   "Face for \\n \\A \\C \\R \\M etc."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-http-mail
-    '((t . (:inherit font-lock-constant-face
-	    :weight bold)))
+  '((t . (:inherit font-lock-constant-face :weight bold)))
   "Face for [http/mail block]."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-dashes-2
-    '((t . (:foreground "sienna"
-	    :weight bold)))
+  '((t . (:foreground "sienna" :weight bold)))
   "Face for --."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-dashes-3
-    '((t . (:foreground "Blue1"
-	    :weight bold)))
+  '((t . (:foreground "Blue1" :weight bold)))
   "Face for ---."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-ellipsis
-    '((t . (:foreground "Blue1"
-	    :weight bold)))
+  '((t . (:foreground "Blue1" :weight bold)))
   "Face for ellipsis (...)."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-html-text
-    '((t . (:foreground "color-105")))
+  '((t . (:foreground "color-105")))
   "Face for {{html text}}."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-bullet
-    '((t .(:foreground "red"
-	   :weight bold)))
+  '((t .(:foreground "red" :weight bold)))
   "Face for bullets."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-bullet-warning
-    '((t . (:foreground "white"
-	    :background "red"
-	    :weight bold)))
+  '((t . (:foreground "white" :background "red" :weight bold)))
   "Warning face for bullets."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-1
-    '((t . (:foreground "color-18"
-	    :weight bold)))
+  '((t . (:foreground "color-18" :weight bold)))
   "Face for title with one \"=\"."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-2
-    '((t . (:foreground "color-21"
-	    :weight bold)))
+  '((t . (:foreground "color-21" :weight bold)))
   "Face for title with two \"==\"."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-3
-    '((t . (:foreground "color-27"
-	    :weight bold)))
+  '((t . (:foreground "color-27" :weight bold)))
   "Face for title with three \"===\"."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-4
-    '((t . (:foreground "color-33"
-	    :weight bold)))
+  '((t . (:foreground "color-33" :weight bold)))
   "Face for title with four \"====\"."
   :group 'jemdoc-mode-faces)
 
@@ -532,28 +521,28 @@ in the code-block arguments."
 		     (line-end-position 0)))
 	      ;; detect the programming language (specified in the second {})
 	      (lang (save-excursion
-		       ;; first, go to the end of the code-block
-		       ;; useful when point is in the arguments of a code-block
-		       (re-search-forward "^ *~~~ *$")
-		       ;; here we are sure that we are in a code block
-		       (re-search-backward "^ *~~~ *\n *{.*?} *{\\(.*?\\)}")
-		       (substring-no-properties (match-string 1)))))
+		      ;; first, go to the end of the code-block
+		      ;; useful when point is in the arguments of a code-block
+		      (re-search-forward "^ *~~~ *$")
+		      ;; here we are sure that we are in a code block
+		      (re-search-backward "^ *~~~ *\n *{.*?} *{\\(.*?\\)}")
+		      (substring-no-properties (match-string 1)))))
 	  (narrow-to-region start end)
 	  (message "lang = %s" lang)
 	  (cond
-	    ((equal lang "lisp")
-	     (emacs-lisp-mode)
-	     (remove-text-properties start end '(font-lock-ignore t)))
-	    ((or (equal lang "python")
-		 (equal lang "py"))
-	     (python-mode)
-	     (remove-text-properties start end '(font-lock-ignore t)))
-	    ((or (equal lang "c++")
-		 (equal lang "cpp"))
-	     (c++-mode)
-	     (remove-text-properties start end '(font-lock-ignore t))
-	     )
-	    ))
+	   ((equal lang "lisp")
+	    (emacs-lisp-mode)
+	    (remove-text-properties start end '(font-lock-ignore t)))
+	   ((or (equal lang "python")
+		(equal lang "py"))
+	    (python-mode)
+	    (remove-text-properties start end '(font-lock-ignore t)))
+	   ((or (equal lang "c++")
+		(equal lang "cpp"))
+	    (c++-mode)
+	    (remove-text-properties start end '(font-lock-ignore t))
+	    )
+	   ))
       (message "warning: not in code block"))))
 
 
@@ -601,12 +590,12 @@ This is the number of characters used for the menu before the code.")
 (make-local-variable 'jemdoc-mode-edit-code-block-buffer-name)
 
 (define-button-type 'jemdoc-mode-insert-button
-    'action 'jemdoc-mode-edit-code-block-insert-back
-    'follow-link t)
+  'action 'jemdoc-mode-edit-code-block-insert-back
+  'follow-link t)
 
 (define-button-type 'jemdoc-mode-abort-button
-    'action 'jemdoc-mode-edit-code-block-abort
-    'follow-link t)
+  'action 'jemdoc-mode-edit-code-block-abort
+  'follow-link t)
 
 (defun jemdoc-mode-edit-code-block ()
   "Edit a code-block in new buffer (appropriate major mode is activated).
@@ -791,7 +780,7 @@ BUTTON is the standard input given to functions registerd in the
 	   (minimal-match (zero-or-more not-newline))
 	   (not (any "\\"))
 	   "+"))
-      1 'jemdoc-mode-face-monospace prepend)
+     1 'jemdoc-mode-face-monospace prepend)
 
    ;; bold
    '("\\(?:^\\|[^\\]\\)\\(\\*.*?[^\\]\\*\\)"  1 'jemdoc-mode-face-bold prepend)
@@ -801,16 +790,16 @@ BUTTON is the standard input given to functions registerd in the
 
    ;; tilde blocks
    '("^~~~" . 'jemdoc-mode-face-tilde-block-delimeters)
-   '(jemdoc-mode-highlight-curly-brackets-tilde-block .
-     'jemdoc-mode-face-tilde-block-delimeters)
+   '(jemdoc-mode-highlight-curly-brackets-tilde-block
+     . 'jemdoc-mode-face-tilde-block-delimeters)
 
    ;; {{html text}}
-   '(jemdoc-mode-highlight-curly-brackets-html-text 0
-     'jemdoc-mode-face-html-text t)
+   '(jemdoc-mode-highlight-curly-brackets-html-text
+     0 'jemdoc-mode-face-html-text t)
 
    ;; +{{monospace html text}}+ or %monospace html text%
-   '(jemdoc-mode-highlight-monospace-html-text 0
-     'jemdoc-mode-face-monospace-html t)
+   '(jemdoc-mode-highlight-monospace-html-text
+     0 'jemdoc-mode-face-monospace-html t)
 
    ;; inline $equations$
    '("\\$.*?\\$" . 'jemdoc-mode-face-equation)
@@ -819,8 +808,8 @@ BUTTON is the standard input given to functions registerd in the
    '("^ *\\\\(.*\\\\)" 0 'jemdoc-mode-face-equation t)
 
    ;; [http/mail/files ...]
-   '("\\[\\(http\\|mail\\|\\./\\|/\\).*\\]" 0
-     'jemdoc-mode-face-http-mail prepend)
+   '("\\[\\(http\\|mail\\|\\./\\|/\\).*\\]"
+     0 'jemdoc-mode-face-http-mail prepend)
 
    ;; syntax-table stuff
    '(jemdoc-mode-property-retrieve 0 'jemdoc-mode-face-special-keywords t)
@@ -845,7 +834,7 @@ BUTTON is the standard input given to functions registerd in the
 
    ;; other
    `(,(regexp-opt '("\\n" "\\A" "\\C" "\\R" "\\M" "\\\#" "\\`" "\\\'" "\\\"")) 0
-      'jemdoc-mode-face-other))
+     'jemdoc-mode-face-other))
   "Keywords to highlight in jemdoc mode.")
 (make-local-variable 'jemdoc-mode-font-lock-keywords)
 
@@ -853,29 +842,27 @@ BUTTON is the standard input given to functions registerd in the
 
 ;;;###autoload
 (define-derived-mode jemdoc-mode prog-mode "jemdoc"
-		     "Major mode for editing jemdoc files."
-		     (setq-local font-lock-defaults '(jemdoc-mode-font-lock-keywords ;; KEYWORDS
-						      nil                            ;; KEYWORDS-ONLY
-						      nil                            ;; CASE-FOLD
-						      nil                            ;; SYNTAX-ALIST
-						      (syntax-propertize-function .
-						       jemdoc-mode-syntax-propertize-function)
-						      (font-lock-extend-after-change-region-function .
-						       jemdoc-mode-extend-region-initialize)
-						      ;; sometimes the region used in jit-lock
-						      ;; doesn't contain the whole block so I
-						      ;; prefer to not use it by default
-						      (font-lock-support-mode .
-						       jemdoc-mode-font-lock-support-mode)
-						      ;; required to use M-;
-						      (comment-start . "#")
-						      ))
-		     (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
-		     (set-syntax-table jemdoc-mode-font-lock-syntax-table)
-		     (when (package-installed-p 'font-lock+)
-		       (require 'font-lock+))
-		     ;; I don't need (setq-local font-lock-multiline t)
-		     )
+  "Major mode for editing jemdoc files."
+  (setq-local font-lock-defaults
+	      '(jemdoc-mode-font-lock-keywords ;; KEYWORDS
+		nil                            ;; KEYWORDS-ONLY
+		nil                            ;; CASE-FOLD
+		nil                            ;; SYNTAX-ALIST
+		(syntax-propertize-function
+		 . jemdoc-mode-syntax-propertize-function)
+		(font-lock-extend-after-change-region-function
+		 . jemdoc-mode-extend-region-initialize)
+		;; sometimes the region used in jit-lock
+		;; doesn't contain the whole block so I
+		;; prefer to not use it by default
+		(font-lock-support-mode . jemdoc-mode-font-lock-support-mode)
+		;; required to use M-;
+		(comment-start . "#")))
+  (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
+  (set-syntax-table jemdoc-mode-font-lock-syntax-table)
+  ;; I don't need (setq-local font-lock-multiline t)
+  (when (package-installed-p 'font-lock+)
+    (require 'font-lock+)))
 
 
 
