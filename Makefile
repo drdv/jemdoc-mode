@@ -2,19 +2,16 @@ EMACS=emacs
 CASK=cask
 PACKAGE-NAME=jemdoc-mode.el
 
-# 1. make cask
-# 2. make
-
-all: build
+all: checkdoc build
 
 checkdoc:
 	$(EMACS) -Q -batch --eval "(checkdoc-file \"${PACKAGE-NAME}\")"
 
-package-lint:
+package-lint: cask
 	${CASK} exec $(EMACS) -Q --batch -l "package-lint.el" \
 	-f "package-lint-batch-and-exit" ${PACKAGE-NAME}
 
-build: checkdoc package-lint
+build: package-lint
 	${CASK} exec  $(EMACS) -Q --batch \
 	--eval "(require 'package)" \
 	--eval "(progn \

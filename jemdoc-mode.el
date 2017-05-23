@@ -46,7 +46,8 @@
 
 
 (defgroup jemdoc-mode-faces nil
-  "Jemdoc-mode related phases.")
+  "Jemdoc-mode related phases."
+  :group 'Faces)
 
 (defface jemdoc-mode-face-monospace
   '((t . (:inherit font-lock-type-face)))
