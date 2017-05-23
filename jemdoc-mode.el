@@ -226,17 +226,17 @@ Text properties:
        (0 (ignore (jemdoc-mode-property-assign))))
       ;; regions to be ignored
       ("^~~~ *$"
-       (0 (ignore (jemdoc-mode-ignore-region))))
-      )
+       (0 (ignore (jemdoc-mode-ignore-region)))))
      start end)))
 
 (defun jemdoc-mode-property-assign ()
   "Assign text properties in keywords in comments."
   (let* ((beg (match-beginning 0))
 	 (str-line (thing-at-point 'line t))
-	 (jemdoc-mode-line-start-p (if (> (length str-line) 9)
-				       (equal (substring str-line 0 9) "# jemdoc:")
-				     nil))
+	 (jemdoc-mode-line-start-p
+	  (if (> (length str-line) 9)
+	      (equal (substring str-line 0 9) "# jemdoc:")
+	    nil))
 	 (context (save-excursion
 		    (save-match-data (syntax-ppss beg)))))
     (when jemdoc-mode-line-start-p
@@ -246,12 +246,14 @@ Text properties:
 
 (defun jemdoc-mode-property-retrieve (limit)
   "Highlight text with jemdoc-keywords-in-comments-property (until LIMIT)."
-  (let ((pos (next-single-char-property-change (point)
-					       'jemdoc-keywords-in-comments-property
-                                               nil limit)))
+  (let ((pos
+	 (next-single-char-property-change (point)
+					   'jemdoc-keywords-in-comments-property
+					   nil limit)))
     (when (and pos (> pos (point)))
       (goto-char pos)
-      (let ((value (get-text-property pos 'jemdoc-keywords-in-comments-property)))
+      (let ((value
+	     (get-text-property pos 'jemdoc-keywords-in-comments-property)))
         (if (eq (car value) t)
             (progn
               (set-match-data (cdr value))
@@ -263,13 +265,16 @@ Text properties:
 (defun jemdoc-mode-highlight-curly-brackets-tilde-block (limit)
   "Highlight curly brackets in the preamble of a tilde block (until LIMIT)."
   ;; search for {}x1 or {}x2 or {}x7
-  (when (re-search-forward "^ *\\(\\({[^}{]*} *\\)\\{1,2\\}\\|\\({[^}{]*} *\\)\\{7,7\\}\\)$" limit t)
+  (when (re-search-forward
+	 "^ *\\(\\({[^}{]*} *\\)\\{1,2\\}\\|\\({[^}{]*} *\\)\\{7,7\\}\\)$"
+	 limit t)
     (save-excursion
       (save-match-data
 	(goto-char (line-beginning-position 0))
-	;; If the match is not preceded by a "^~~~ *$" I don't want to return nil
-	;; because the search for this keyword would terminate (and there might be
-	;; more matches below). Instead, I return true but with empty match data.
+	;; If the match is not preceded by a "^~~~ *$" I don't want to return
+	;; nil because the search for this keyword would terminate (and there
+	;; might be more matches below). Instead, I return true but with empty
+	;; match data.
 	(unless (looking-at "^~~~ *$")
 	  (set-match-data nil))))
     t))
@@ -318,7 +323,8 @@ refer to dynamically bound variables used by font-lock."
   (save-excursion
     (when jemdoc-mode-debug-messages
       (message "----------------------------------------------------")
-      (message "[initial]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
+      (message "[initial]: font-lock-beg = %d, font-lock-end = %d, point = %d"
+	       font-lock-beg font-lock-end (point)))
     (save-excursion
       (goto-char (line-beginning-position 2))
       (when jemdoc-mode-debug-messages
@@ -329,7 +335,9 @@ refer to dynamically bound variables used by font-lock."
       ;; ^ *$     (empty line)
       ;; \\'      (end of buffer)
       ;; ^~~~ *$  (beginning or end of a tilde block)
-      (if (re-search-forward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\'\\|^~~~ *$\\)" nil t)
+      (if (re-search-forward
+	   "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\'\\|^~~~ *$\\)"
+	   nil t)
 	  (progn
 	    (when jemdoc-mode-debug-messages
 	      (message "[after first search]: point = %d" (point)))
@@ -350,22 +358,25 @@ refer to dynamically bound variables used by font-lock."
       (goto-char (line-beginning-position 0)))
     ;; the only difference with the regex above is that here I have
     ;; \\` (i.e., beginning of buffer) instead of \\' (i.e., end of buffer)
-    (if (re-search-backward "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\`\\|^~~~ *$\\)" nil t)
+    (if (re-search-backward
+	 "\\(^ *- +\\|^ *\\. +\\|^ *$\\|\\`\\|^~~~ *$\\)"
+	 nil t)
 	(progn
 	  (when jemdoc-mode-debug-messages
 	    (message "[after second search]: point = %d" (point)))
-	  (when (< (match-beginning 0) font-lock-beg) ;; don't shorten the region
+	  ;; don't shorten the region
+	  (when (< (match-beginning 0) font-lock-beg)
 	    (setq font-lock-beg (match-beginning 0))))
-      (setq font-lock-beg (point-min)))
-    )
+      (setq font-lock-beg (point-min))))
   (when jemdoc-mode-debug-messages
-    (message "[extend]: font-lock-beg = %d, font-lock-end = %d, point = %d" font-lock-beg font-lock-end (point)))
+    (message "[extend]: font-lock-beg = %d, font-lock-end = %d, point = %d"
+	     font-lock-beg font-lock-end (point)))
   nil)
 
 (defun jemdoc-mode-extend-region-initialize (beg end &optional len)
   "Reset `jemdoc-mode-region-extended-already'.
 
-BEG, END and LEN are the standard arguments provided to `after-change-functions'."
+BEG, END and LEN are the standard input provided to `after-change-functions'."
   (setq jemdoc-mode-region-extended-already nil)
   nil)
 
@@ -378,7 +389,8 @@ registered in `font-lock-extend-region-functions'."
     (jemdoc-mode-extend-bullet-region)
     (jemdoc-mode-extend-tilde-region))
   (when jemdoc-mode-debug-messages
-    (message "[while]: font-lock-beg = %d, font-lock-end = %d" font-lock-beg font-lock-end))
+    (message "[while]: font-lock-beg = %d, font-lock-end = %d"
+	     font-lock-beg font-lock-end))
   ;; this function is executed first among the functions in
   ;; `font-lock-extend-region-functions' and there is no problem
   ;; to always return true even if we haven't changed the region
@@ -402,13 +414,17 @@ registered in `font-lock-extend-region-functions'."
 Delimeters can be: empty line, end of buffer, or line starting with
 STR appearing N or less times in a row."
   (save-excursion
-    ;; find an empty line ("^$"), end of buffer ("\\'") or a line starting with 1, ..., n str
-    (re-search-forward (let ((S "\\(\\'\\|^ *$"))
-			 (while (> n 0)
-			   (setq S (concat S (format "\\|^ *%s +" (jemdoc-mode-concat-string str n))))
-			   (setq n (1- n)))
-			 (setq S (concat S "\\)")))
-		       nil t)))
+    ;; find an empty line ("^$"), end of buffer ("\\'")
+    ;; or a line starting with 1, ..., n str
+    (re-search-forward
+     (let ((S "\\(\\'\\|^ *$"))
+       (while (> n 0)
+	 (setq S (concat
+		  S
+		  (format "\\|^ *%s +" (jemdoc-mode-concat-string str n))))
+	 (setq n (1- n)))
+       (setq S (concat S "\\)")))
+     nil t)))
 
 
 
@@ -421,11 +437,12 @@ return a cell array with its beginning and end.  If not, return nil.
 TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
   (save-excursion
     (let ((p (point))
-	  (regexp (if (eq tilde-block-type 'code-block)
-		      ;; code block
-		      "^ *\\({[^}{]*} *\\)\\{2,2\\}$"
-		    ;; general-block
-		    "^ *\\(\\({[^}{]*} *\\)\\{1,2\\}\\|\\({[^}{]*} *\\)\\{7,7\\}\\)$"))
+	  (regexp
+	   (if (eq tilde-block-type 'code-block)
+	       ;; code block
+	       "^ *\\({[^}{]*} *\\)\\{2,2\\}$"
+	     ;; general-block
+	     "^ *\\(\\({[^}{]*} *\\)\\{1,2\\}\\|\\({[^}{]*} *\\)\\{7,7\\}\\)$"))
 	  beg
 	  end)
       (catch 'drdv-return
@@ -516,7 +533,7 @@ in the code-block arguments."
 	      ;; detect the programming language (specified in the second {})
 	      (lang (save-excursion
 		       ;; first, go to the end of the code-block
-		       ;; useful when point is in the arguments of the code-block
+		       ;; useful when point is in the arguments of a code-block
 		       (re-search-forward "^ *~~~ *$")
 		       ;; here we are sure that we are in a code block
 		       (re-search-backward "^ *~~~ *\n *{.*?} *{\\(.*?\\)}")
@@ -541,9 +558,10 @@ in the code-block arguments."
 
 
 
-;; Here I am adopting/stealing the approach from github.com/aaronbieber/fence-edit.el
+;; Here I am adopting/stealing the approach from
+;; github.com/aaronbieber/fence-edit.el
 ;; see as well the discussion in
-;; https://www.reddit.com/r/emacs/comments/42yi77/any_solution_for_editing_a_region_in_a_different/
+;; www.reddit.com/r/emacs/comments/42yi77/any_solution_for_editing_a_region_in_a_different
 
 (defvar jemdoc-mode-lang-mode-alist
   '(("lisp"   . "emacs-lisp-mode")
@@ -597,17 +615,19 @@ arguments of the code-block."
   (interactive)
   (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
     (if region
-	(let* ((m-beg (set-marker (make-marker) (save-excursion
-						  (goto-char (car region))
-						  ;; skip the oppening ~~~\n{...}{...}
-						  (line-beginning-position 3))))
-	       (m-end (set-marker (make-marker) (save-excursion
-						  (goto-char (cdr region))
-						  ;; skip the closing ~~~
-						  (line-end-position 0))))
+	(let* ((m-beg (set-marker (make-marker)
+				  (save-excursion
+				    (goto-char (car region))
+				    ;; skip the oppening ~~~\n{...}{...}
+				    (line-beginning-position 3))))
+	       (m-end (set-marker (make-marker)
+				  (save-excursion
+				    (goto-char (cdr region))
+				    ;; skip the closing ~~~
+				    (line-end-position 0))))
 	       (lang (save-excursion
 		       ;; first, go to the end of the code-block
-		       ;; useful when point is in the arguments of the code-block
+		       ;; useful when point is in the arguments of a code-block
 		       (re-search-forward "^ *~~~ *$")
 		       ;; here we are sure that we are in a code block
 		       (re-search-backward "^ *~~~ *\n *{.*?} *{\\(.*?\\)}")
@@ -615,11 +635,13 @@ arguments of the code-block."
 	       (code (buffer-substring-no-properties m-beg m-end))
 	       (mode (cdr (assoc lang jemdoc-mode-lang-mode-alist)))
 	       ;;(ovl (make-overlay m-beg m-end))
-	       (edit-buffer (progn
-			      ;; make sure that there is only one code-block editor buffer
-			      (when (get-buffer jemdoc-mode-edit-code-block-buffer-name)
-				(kill-buffer jemdoc-mode-edit-code-block-buffer-name))
-			      (generate-new-buffer jemdoc-mode-edit-code-block-buffer-name))))
+	       (edit-buffer
+		(progn
+		  ;; make sure that there is only one code-block editor buffer
+		  (when (get-buffer jemdoc-mode-edit-code-block-buffer-name)
+		    (kill-buffer jemdoc-mode-edit-code-block-buffer-name))
+		  (generate-new-buffer
+		   jemdoc-mode-edit-code-block-buffer-name))))
 	  ;; (switch-to-buffer-other-window edit-buffer t)
 	  (switch-to-buffer edit-buffer t)
 	  ;;(overlay-put ovl 'face 'secondary-selection)
@@ -628,7 +650,8 @@ arguments of the code-block."
 	  (insert "\^L\n")        ;; 22:23
 	  (setq jemdoc-mode-edit-abort-button 12
 		jemdoc-mode-edit-preamble-length 23)
-	  (put-text-property (point-min) jemdoc-mode-edit-preamble-length 'read-only t)
+	  (put-text-property (point-min)
+			     jemdoc-mode-edit-preamble-length 'read-only t)
 	  (make-button 1
 		       (1- jemdoc-mode-edit-abort-button)
 		       :type 'jemdoc-mode-insert-button)
@@ -641,12 +664,13 @@ arguments of the code-block."
 	    (error
 	     (message "warning: major mode `%s' fails with: %s" mode e)
 	     (fundamental-mode)))
-	  ;; note: `header-line-format' automatically becomes buffer-local when set
-	  (setq header-line-format (concat "jemdoc-code-block-editor [" mode "]: "
-					   (format "region (%d,%d) in %s"
-						   (marker-position m-beg)
-						   (marker-position m-end)
-						   (marker-buffer m-beg))))
+	  ;; `header-line-format' automatically becomes buffer-local when set
+	  (setq header-line-format
+		(concat "jemdoc-code-block-editor [" mode "]: "
+			(format "region (%d,%d) in %s"
+				(marker-position m-beg)
+				(marker-position m-end)
+				(marker-buffer m-beg))))
 	  (goto-char jemdoc-mode-edit-abort-button)
 	  (setq jemdoc-mode-code-block-beg m-beg
 		jemdoc-mode-code-block-end m-end))
@@ -657,8 +681,9 @@ arguments of the code-block."
 BUTTON is the standard input given to functions registerd in the
 `action' property of `define-button-type'."
   (let ((buffer (current-buffer))
-        (code (buffer-substring-no-properties (1+ jemdoc-mode-edit-preamble-length)
-					      (point-max))))
+        (code (buffer-substring-no-properties
+	       (1+ jemdoc-mode-edit-preamble-length)
+	       (point-max))))
 
     (switch-to-buffer (marker-buffer jemdoc-mode-code-block-beg))
     (kill-buffer buffer)
@@ -683,7 +708,6 @@ BUTTON is the standard input given to functions registerd in the
 
 (defvar jemdoc-mode-font-lock-keywords
   (list
-
    ;; ---------------------------------------------------------
 
    '("^ *\\(-\\) +" (1 'jemdoc-mode-face-bullet)
@@ -777,13 +801,16 @@ BUTTON is the standard input given to functions registerd in the
 
    ;; tilde blocks
    '("^~~~" . 'jemdoc-mode-face-tilde-block-delimeters)
-   '(jemdoc-mode-highlight-curly-brackets-tilde-block . 'jemdoc-mode-face-tilde-block-delimeters)
+   '(jemdoc-mode-highlight-curly-brackets-tilde-block .
+     'jemdoc-mode-face-tilde-block-delimeters)
 
    ;; {{html text}}
-   '(jemdoc-mode-highlight-curly-brackets-html-text 0 'jemdoc-mode-face-html-text t)
+   '(jemdoc-mode-highlight-curly-brackets-html-text 0
+     'jemdoc-mode-face-html-text t)
 
    ;; +{{monospace html text}}+ or %monospace html text%
-   '(jemdoc-mode-highlight-monospace-html-text 0 'jemdoc-mode-face-monospace-html t)
+   '(jemdoc-mode-highlight-monospace-html-text 0
+     'jemdoc-mode-face-monospace-html t)
 
    ;; inline $equations$
    '("\\$.*?\\$" . 'jemdoc-mode-face-equation)
@@ -792,7 +819,8 @@ BUTTON is the standard input given to functions registerd in the
    '("^ *\\\\(.*\\\\)" 0 'jemdoc-mode-face-equation t)
 
    ;; [http/mail/files ...]
-   '("\\[\\(http\\|mail\\|\\./\\|/\\).*\\]" 0 'jemdoc-mode-face-http-mail prepend)
+   '("\\[\\(http\\|mail\\|\\./\\|/\\).*\\]" 0
+     'jemdoc-mode-face-http-mail prepend)
 
    ;; syntax-table stuff
    '(jemdoc-mode-property-retrieve 0 'jemdoc-mode-face-special-keywords t)
@@ -816,9 +844,8 @@ BUTTON is the standard input given to functions registerd in the
    ;; ---------------------------------------------------------
 
    ;; other
-   `(,(regexp-opt '("\\n" "\\A" "\\C" "\\R" "\\M" "\\\#" "\\`" "\\\'" "\\\"")) 0 'jemdoc-mode-face-other)
-
-   )
+   `(,(regexp-opt '("\\n" "\\A" "\\C" "\\R" "\\M" "\\\#" "\\`" "\\\'" "\\\"")) 0
+      'jemdoc-mode-face-other))
   "Keywords to highlight in jemdoc mode.")
 (make-local-variable 'jemdoc-mode-font-lock-keywords)
 
