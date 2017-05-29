@@ -576,12 +576,12 @@ in the code-block arguments."
 (defvar jemdoc-mode-code-block-beg nil
   "Mark (in jemdoc buffer) for beginning of region to edit.
 This variable is set in the jemdoc-buffer but is accessed from
-the edit-buffer (so I don't use defvar-local).")
+the edit-buffer (so I don't use `defvar-local').")
 
 (defvar jemdoc-mode-code-block-end nil
   "Mark (in jemdoc buffer) for end of region to edit.
 This variable is set in the jemdoc-buffer but is accessed from
-the edit-buffer (so I don't use defvar-local).")
+the edit-buffer (so I don't use `defvar-local').")
 
 (defconst jemdoc-mode-edit-code-block-buffer-name "*edit-code-block*"
   "Name of the buffer where we edit code-blocks.")
