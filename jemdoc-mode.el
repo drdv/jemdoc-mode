@@ -1,4 +1,4 @@
-;;; jemdoc-mode.el --- Major mode for editting jemdoc files
+;;; jemdoc-mode.el --- Major mode for editing jemdoc files
 
 ;; Copyright (C) 2017 Dimitar Dimitrov
 
@@ -45,9 +45,17 @@
 
 
 
+;; used to not fontify the content of a code-block
+(require 'font-lock+ nil t)
+
+(defgroup jemdoc-mode nil
+  "Major mode for editing jemdoc files."
+  :group 'languages)
+
 (defgroup jemdoc-mode-faces nil
   "Jemdoc-mode related phases."
-  :group 'Faces)
+  :group 'jemdoc-mode
+  :group 'faces)
 
 (defface jemdoc-mode-face-monospace
   '((t . (:inherit font-lock-type-face)))
@@ -64,9 +72,9 @@
   "Face for /italics/."
   :group 'jemdoc-mode-faces)
 
-(defface jemdoc-mode-face-tilde-block-delimeters
+(defface jemdoc-mode-face-tilde-block-delimiters
   '((t . (:inherit 'success)))
-  "Face for tilde block delimeters."
+  "Face for tilde block delimiters."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-equation
@@ -154,24 +162,21 @@ or #include{name of file}."
 
 
 
-(defvar jemdoc-mode-debug-messages nil
+(defvar-local jemdoc-mode-debug-messages nil
   "Set to non-nil to output debug messages.")
-(make-local-variable 'jemdoc-mode-debug-messages)
 
 (defvar jemdoc-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x n r") 'jemdoc-mode-edit-code-block)
     map)
   "Keymap for jemdoc major mode.")
-(make-local-variable 'jemdoc-mode-map)
 
-(defvar jemdoc-mode-region-extended-already nil
+(defvar-local jemdoc-mode-region-extended-already nil
   "`jemdoc-mode-extend-region' should change the region only once per iteration.
 
 After each font-lock iteration, it is set back to nil in
 `jemdoc-mode-extend-region-initialize', which is registerd in
 `font-lock-extend-after-change-region-function'.")
-(make-local-variable 'jemdoc-mode-region-extended-already)
 
 (defvar jemdoc-mode-font-lock-syntax-table
   (let ((st (make-syntax-table)))
@@ -181,11 +186,9 @@ After each font-lock iteration, it is set back to nil in
     (modify-syntax-entry ?\n ">#b" st)
     st)
   "Syntax table for `jemdoc-mode'.")
-(make-local-variable 'jemdoc-mode-font-lock-syntax-table)
 
-(defvar jemdoc-mode-font-lock-support-mode nil
+(defvar-local jemdoc-mode-font-lock-support-mode nil
   "Specify the support mode for jemdoc.")
-(make-local-variable 'jemdoc-mode-font-lock-support-mode)
 
 ;; To suppress warnings during byte-compilation.
 (defvar font-lock-beg)
@@ -399,9 +402,9 @@ registered in `font-lock-extend-region-functions'."
     out-str))
 
 (defun jemdoc-mode-end-of-block (str n)
-  "Return position of next delimeter.
+  "Return position of next delimiter.
 
-Delimeters can be: empty line, end of buffer, or line starting with
+Delimiters can be: empty line, end of buffer, or line starting with
 STR appearing N or less times in a row."
   (save-excursion
     ;; find an empty line ("^$"), end of buffer ("\\'")
@@ -553,7 +556,7 @@ in the code-block arguments."
 ;; see as well the discussion in
 ;; www.reddit.com/r/emacs/comments/42yi77/any_solution_for_editing_a_region_in_a_different
 
-(defvar jemdoc-mode-lang-mode-alist
+(defvar-local jemdoc-mode-lang-mode-alist
   '(("lisp"   . "emacs-lisp-mode")
     ("elisp"  . "emacs-lisp-mode")
     ("c++"    . "c++-mode")
@@ -567,28 +570,29 @@ in the code-block arguments."
     ("octave" . "octave-mode")
     ("matlab" . "octave-mode"))
   "Association between programming language specifier and major mode.")
-(make-local-variable 'jemdoc-mode-lang-mode-alist)
 
 (defvar jemdoc-mode-code-block-beg nil
-  "Mark (in jemdoc buffer) for beginning of region to edit.")
-(make-local-variable 'jemdoc-mode-code-block-beg)
+  "Mark (in jemdoc buffer) for beginning of region to edit.
+This variable is set in the jemdoc-buffer but is accessed from
+the edit-buffer (so I don't use defvar-local).")
 
 (defvar jemdoc-mode-code-block-end nil
-  "Mark (in jemdoc buffer) for end of region to edit.")
-(make-local-variable 'jemdoc-mode-code-block-end)
+  "Mark (in jemdoc buffer) for end of region to edit.
+This variable is set in the jemdoc-buffer but is accessed from
+the edit-buffer (so I don't use defvar-local).")
 
-(defvar jemdoc-mode-edit-preamble-length nil
-  "Length of preamble when editting code-blocks.
-This is the number of characters used for the menu before the code.")
-(make-local-variable 'jemdoc-mode-edit-preamble-length)
-
-(defvar jemdoc-mode-edit-abort-button nil
-  "Position of abort button in the preamble when editting code-blocks.")
-(make-local-variable 'jemdoc-mode-edit-abort-button)
-
-(defvar jemdoc-mode-edit-code-block-buffer-name "*edit-code-block*"
+(defconst jemdoc-mode-edit-code-block-buffer-name "*edit-code-block*"
   "Name of the buffer where we edit code-blocks.")
-(make-local-variable 'jemdoc-mode-edit-code-block-buffer-name)
+
+(defconst jemdoc-mode-edit-insert-button-name "← [insert]\n"
+  "Name of the abort button in the preamble when editing code-blocks.")
+
+(defconst jemdoc-mode-edit-abort-button-name "× [abort]\n"
+  "Name of the abort button in the preamble when editing code-blocks.")
+
+(defconst jemdoc-mode-edit-preamble-termination-indicator "\^L\n"
+  "Length of preamble when editing code-blocks.
+This is the number of characters used for the menu before the code.")
 
 (define-button-type 'jemdoc-mode-insert-button
   'action 'jemdoc-mode-edit-code-block-insert-back
@@ -615,6 +619,13 @@ arguments of the code-block."
 				    (goto-char (cdr region))
 				    ;; skip the closing ~~~
 				    (line-end-position 0))))
+	       ;; the abort button is placed right after the insert button
+	       (abort-button-location
+		(1+ (length jemdoc-mode-edit-insert-button-name)))
+	       (preamble-length
+		(+ (length jemdoc-mode-edit-insert-button-name)
+		   (length jemdoc-mode-edit-abort-button-name)
+		   (length jemdoc-mode-edit-preamble-termination-indicator)))
 	       (lang (save-excursion
 		       ;; first, go to the end of the code-block
 		       ;; useful when point is in the arguments of a code-block
@@ -632,21 +643,21 @@ arguments of the code-block."
 		    (kill-buffer jemdoc-mode-edit-code-block-buffer-name))
 		  (generate-new-buffer
 		   jemdoc-mode-edit-code-block-buffer-name))))
+	  (setq jemdoc-mode-code-block-beg m-beg
+		jemdoc-mode-code-block-end m-end)
 	  ;; (switch-to-buffer-other-window edit-buffer t)
 	  (switch-to-buffer edit-buffer t)
 	  ;;(overlay-put ovl 'face 'secondary-selection)
-	  (insert "← [insert]\n") ;;  1:11
-	  (insert "× [abort]\n")  ;; 12:21
-	  (insert "\^L\n")        ;; 22:23
-	  (setq jemdoc-mode-edit-abort-button 12
-		jemdoc-mode-edit-preamble-length 23)
+	  (insert jemdoc-mode-edit-insert-button-name)
+	  (insert jemdoc-mode-edit-abort-button-name)
+	  (insert jemdoc-mode-edit-preamble-termination-indicator)
 	  (put-text-property (point-min)
-			     jemdoc-mode-edit-preamble-length 'read-only t)
+			     preamble-length 'read-only t)
 	  (make-button 1
-		       (1- jemdoc-mode-edit-abort-button)
+		       (1- abort-button-location)
 		       :type 'jemdoc-mode-insert-button)
-	  (make-button jemdoc-mode-edit-abort-button
-		       (- jemdoc-mode-edit-preamble-length 2)
+	  (make-button abort-button-location
+		       (- preamble-length 2)
 		       :type 'jemdoc-mode-abort-button)
 	  (insert code)
 	  (condition-case e
@@ -658,21 +669,24 @@ arguments of the code-block."
 	  (setq header-line-format
 		(concat "jemdoc-code-block-editor [" mode "]: "
 			(format "region (%d,%d) in %s"
-				(marker-position m-beg)
-				(marker-position m-end)
-				(marker-buffer m-beg))))
-	  (goto-char jemdoc-mode-edit-abort-button)
-	  (setq jemdoc-mode-code-block-beg m-beg
-		jemdoc-mode-code-block-end m-end))
+				(marker-position jemdoc-mode-code-block-beg)
+				(marker-position jemdoc-mode-code-block-end)
+				(marker-buffer jemdoc-mode-code-block-beg))))
+	  (goto-char abort-button-location))
       (message "warning: not in code-block"))))
 
 (defun jemdoc-mode-edit-code-block-insert-back (button)
   "Insert edited code-block back in the jemdoc buffer.
 BUTTON is the standard input given to functions registerd in the
 `action' property of `define-button-type'."
-  (let ((buffer (current-buffer))
-        (code (buffer-substring-no-properties
-	       (1+ jemdoc-mode-edit-preamble-length)
+  (let* ((buffer (current-buffer))
+	 (preamble-length
+	  (+ (length jemdoc-mode-edit-insert-button-name)
+	     (length jemdoc-mode-edit-abort-button-name)
+	     (length jemdoc-mode-edit-preamble-termination-indicator)
+	     1))
+	 (code (buffer-substring-no-properties
+	       (1+ preamble-length)
 	       (point-max))))
 
     (switch-to-buffer (marker-buffer jemdoc-mode-code-block-beg))
@@ -790,9 +804,9 @@ BUTTON is the standard input given to functions registerd in the
    '("\\(?:^\\|[^\\]\\)\\(/.*?[^\\]/\\)"  1 'jemdoc-mode-face-italics prepend)
 
    ;; tilde blocks
-   '("^~~~" . 'jemdoc-mode-face-tilde-block-delimeters)
+   '("^~~~" . 'jemdoc-mode-face-tilde-block-delimiters)
    '(jemdoc-mode-highlight-curly-brackets-tilde-block
-     . 'jemdoc-mode-face-tilde-block-delimeters)
+     . 'jemdoc-mode-face-tilde-block-delimiters)
 
    ;; {{html text}}
    '(jemdoc-mode-highlight-curly-brackets-html-text
@@ -837,7 +851,6 @@ BUTTON is the standard input given to functions registerd in the
    `(,(regexp-opt '("\\n" "\\A" "\\C" "\\R" "\\M" "\\\#" "\\`" "\\\'" "\\\"")) 0
      'jemdoc-mode-face-other))
   "Keywords to highlight in jemdoc mode.")
-(make-local-variable 'jemdoc-mode-font-lock-keywords)
 
 
 
@@ -860,10 +873,8 @@ BUTTON is the standard input given to functions registerd in the
 		;; required to use M-;
 		(comment-start . "#")))
   (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
-  (set-syntax-table jemdoc-mode-font-lock-syntax-table)
   ;; I don't need (setq-local font-lock-multiline t)
-  (when (package-installed-p 'font-lock+)
-    (require 'font-lock+)))
+  (set-syntax-table jemdoc-mode-font-lock-syntax-table))
 
 
 

@@ -1,6 +1,6 @@
 # jemdoc-mode for Emacs
 
-`jemdoc-mode` is a major mode for editting [jemdoc](http://jemdoc.jaboc.net) files.
+`jemdoc-mode` is a major mode for editing [jemdoc](http://jemdoc.jaboc.net) files.
 
 # Installation:
 
