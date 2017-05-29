@@ -68,8 +68,10 @@
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-italics
-  '((t . (:inherit 'shadow)))
-  "Face for /italics/."
+  '((t . (:inherit 'italic :foreground "dark slate blue")))
+  "Face for /italics/.
+When using emacs in macos Terminal, :slant doesn't have an effect,
+thats why I set :foreground as well."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-tilde-block-delimiters
@@ -96,8 +98,13 @@ or #include{name of file}."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-monospace-html
-  '((t . (:inherit font-lock-function-name-face)))
+  '((t . (:inherit font-lock-function-name-face :weight bold)))
   "Face for +{{monospace html}}+ which is equivalent to %monospace html%."
+  :group 'jemdoc-mode-faces)
+
+(defface jemdoc-mode-face-html-text
+  '((t . (:inherit font-lock-function-name-face)))
+  "Face for {{html text}}."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-other
@@ -111,52 +118,47 @@ or #include{name of file}."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-dashes-2
-  '((t . (:foreground "sienna" :weight bold)))
+  '((t . (:inherit font-lock-variable-name-face :weight bold)))
   "Face for --."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-dashes-3
-  '((t . (:foreground "Blue1" :weight bold)))
+  '((t . (:inherit font-lock-function-name-face :weight bold)))
   "Face for ---."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-ellipsis
-  '((t . (:foreground "Blue1" :weight bold)))
+  '((t . (:inherit font-lock-function-name-face :weight bold)))
   "Face for ellipsis (...)."
   :group 'jemdoc-mode-faces)
 
-(defface jemdoc-mode-face-html-text
-  '((t . (:foreground "color-105")))
-  "Face for {{html text}}."
-  :group 'jemdoc-mode-faces)
-
 (defface jemdoc-mode-face-bullet
-  '((t .(:foreground "red" :weight bold)))
+  '((t .(:inherit bold :foreground "red")))
   "Face for bullets."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-bullet-warning
-  '((t . (:foreground "white" :background "red" :weight bold)))
+  '((t . (:inherit font-lock-warning-face :background "dark slate blue")))
   "Warning face for bullets."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-1
-  '((t . (:foreground "color-18" :weight bold)))
+  '((t . (:inherit bold :foreground "color-18")))
   "Face for title with one \"=\"."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-2
-  '((t . (:foreground "color-21" :weight bold)))
+  '((t . (:inherit bold :foreground "color-21")))
   "Face for title with two \"==\"."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-3
-  '((t . (:foreground "color-27" :weight bold)))
+  '((t . (:inherit bold :foreground "color-27")))
   "Face for title with three \"===\"."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-title-4
-  '((t . (:foreground "color-33" :weight bold)))
+  '((t . (:inherit bold :foreground "color-33")))
   "Face for title with four \"====\"."
   :group 'jemdoc-mode-faces)
 
@@ -857,6 +859,7 @@ BUTTON is the standard input given to functions registerd in the
 ;;;###autoload
 (define-derived-mode jemdoc-mode prog-mode "jemdoc"
   "Major mode for editing jemdoc files."
+  (set (make-local-variable 'comment-start) "#") ;; required to use M-;
   (setq-local font-lock-defaults
 	      '(jemdoc-mode-font-lock-keywords ;; KEYWORDS
 		nil                            ;; KEYWORDS-ONLY
@@ -869,9 +872,7 @@ BUTTON is the standard input given to functions registerd in the
 		;; sometimes the region used in jit-lock
 		;; doesn't contain the whole block so I
 		;; prefer to not use it by default
-		(font-lock-support-mode . jemdoc-mode-font-lock-support-mode)
-		;; required to use M-;
-		(comment-start . "#")))
+		(font-lock-support-mode . jemdoc-mode-font-lock-support-mode)))
   (add-hook 'font-lock-extend-region-functions 'jemdoc-mode-extend-region)
   ;; I don't need (setq-local font-lock-multiline t)
   (set-syntax-table jemdoc-mode-font-lock-syntax-table))
