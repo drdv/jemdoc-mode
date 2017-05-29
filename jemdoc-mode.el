@@ -4,7 +4,7 @@
 
 ;; Author: Dimitar Dimitrov <mail.mitko@gmail.com>
 ;; URL: https://github.com/drdv/jemdoc-mode
-;; Package-Version: 20170413.1
+;; Package-Version: 20170529.1
 ;; Package-Requires: ((emacs "24.3"))
 ;; Keywords: convenience, usability
 
@@ -16,7 +16,7 @@
 
 ;;; Commentary:
 
-;; Pakage tested on:
+;; Package tested on:
 ;; GNU Emacs 25.1.1 (x86_64-apple-darwin16.1.0)
 ;;
 ;; jemdoc is a light text-based markup language designed
@@ -71,7 +71,7 @@
   '((t . (:inherit 'italic :foreground "dark slate blue")))
   "Face for /italics/.
 When using emacs in macos Terminal, :slant doesn't have an effect,
-thats why I set :foreground as well."
+that's why I set :foreground as well."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-tilde-block-delimiters
@@ -109,7 +109,7 @@ or #include{name of file}."
 
 (defface jemdoc-mode-face-other
   '((t . (:inherit font-lock-constant-face)))
-  "Face for \\n \\A \\C \\R \\M etc."
+  "Face for \\n, \\A, \\C, \\R, \\M, `singly quoted text', etc."
   :group 'jemdoc-mode-faces)
 
 (defface jemdoc-mode-face-http-mail
@@ -389,7 +389,7 @@ registered in `font-lock-extend-region-functions'."
   ;; this function is executed first among the functions in
   ;; `font-lock-extend-region-functions' and there is no problem
   ;; to always return true even if we haven't changed the region
-  ;; becasue this wouldn't cause the start of other iterations
+  ;; because this wouldn't cause the start of other iterations
   ;; in the while loop of `font-lock-default-fontify-region'
   t)
 
@@ -462,12 +462,12 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	))))
 
 (defun jemdoc-mode-ignore-region ()
-  "Assigne text property 'font-lock-ignore to code-blocks."
+  "Assign text property 'font-lock-ignore to code-blocks."
   (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
     (when region
       (let ((start (save-excursion
 		     (goto-char (car region))
-		     ;; leave the highlightling of the oppening ~~~\n{}{}
+		     ;; leave the highlightling of the opening ~~~\n{}{}
 		     (line-beginning-position 3)))
 	    (end (save-excursion
 		   (goto-char (cdr region))
@@ -519,7 +519,7 @@ in the code-block arguments."
     (if region
 	(let ((start (save-excursion
 		       (goto-char (car region))
-		       ;; skip the oppening ~~~\n{}{}
+		       ;; skip the opening ~~~\n{}{}
 		       (line-beginning-position 3)))
 	      (end (save-excursion
 		     (goto-char (cdr region))
@@ -614,7 +614,7 @@ arguments of the code-block."
 	(let* ((m-beg (set-marker (make-marker)
 				  (save-excursion
 				    (goto-char (car region))
-				    ;; skip the oppening ~~~\n{...}{...}
+				    ;; skip the opening ~~~\n{...}{...}
 				    (line-beginning-position 3))))
 	       (m-end (set-marker (make-marker)
 				  (save-excursion
@@ -769,7 +769,7 @@ BUTTON is the standard input given to functions registerd in the
    ;; ---------------------------------------------------------
 
    ;; handle `singly quoted text'
-   '("\`.*?\'"  . 'emdoc-face-other)
+   '("\`.*?\'"  . 'jemdoc-mode-face-other)
 
    ;; titles
    '("^ *= +.*"    0 'jemdoc-mode-face-title-1 t)
