@@ -4,10 +4,10 @@
 
 # Installation:
 
-#### Via MELPA (not added yet)
+#### Via MELPA (recommended)
 
 If you have a recent version of `package.el` you can install `jemdoc-mode` from
-the [MELPA](http://melpa.org) package repository (**note**: pull request awaiting merging).
+the [MELPA](http://melpa.org) package repository.
 
 #### Manually
 
