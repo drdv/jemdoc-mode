@@ -1,3 +1,5 @@
+[![MELPA](https://melpa.org/packages/jemdoc-mode-badge.svg)](https://melpa.org/#/jemdoc-mode)
+
 # jemdoc-mode for Emacs
 
 `jemdoc-mode` is a major mode for editing [jemdoc](http://jemdoc.jaboc.net) files.
