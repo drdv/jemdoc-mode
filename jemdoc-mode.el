@@ -458,8 +458,7 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	(goto-char (line-beginning-position 2))
 	(if (looking-at regexp)
 	    `(,beg . ,end)
-	  nil)
-	))))
+	  nil)))))
 
 (defun jemdoc-mode-ignore-region ()
   "Assign text property 'font-lock-ignore to code-blocks."
@@ -546,9 +545,7 @@ in the code-block arguments."
 	   ((or (equal lang "c++")
 		(equal lang "cpp"))
 	    (c++-mode)
-	    (remove-text-properties start end '(font-lock-ignore t))
-	    )
-	   ))
+	    (remove-text-properties start end '(font-lock-ignore t)))))
       (message "warning: not in code block"))))
 
 
