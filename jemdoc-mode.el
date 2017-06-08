@@ -164,6 +164,9 @@ or #include{name of file}."
 
 
 
+(defvar-local jemdoc-mode-tilde-block-delimiter-last-value nil
+  "Record the last assigned value of the text property `tilde-block-delimiter'.")
+
 (defvar-local jemdoc-mode-debug-messages nil
   "Set to non-nil to output debug messages.")
 
@@ -207,6 +210,8 @@ Text properties:
   (let ((case-fold-search nil))
     (goto-char start)
 
+    ;;(message "syntax: %d - %d" start end)
+
     (remove-text-properties start end '(jemdoc-keywords-in-comments-property))
     (remove-text-properties start end '(font-lock-ignore t))
 
@@ -219,10 +224,56 @@ Text properties:
 		     "noeqs" "noeqcache" "eqsize" "eqdir")
 		   'words)
        (0 (ignore (jemdoc-mode-property-assign))))
-      ;; regions to be ignored
+      ;; handle tilde blocks
       ("^~~~ *$"
-       (0 (ignore (jemdoc-mode-ignore-region)))))
-     start end)))
+       (0 (ignore (jemdoc-mode-tilde-block-start-end)))))
+     start end))
+  (when (eq jemdoc-mode-tilde-block-delimiter-last-value 'start)
+    (message "Warning: wrong delimiters of tilde blocks.")))
+
+(defun jemdoc-mode-tilde-block-start-end ()
+  "Assign text properties 'tilde-block-delimiter.
+start - to first character of ~~~ at the beginning of tilde-blocks
+end   - to first character of ~~~ at the end of tilde-blocks."
+  (let (previous-label
+	tmp)
+    ;; first, record the 'tilde-block-delimiter text property of
+    ;; the previous "^~~~ *$" (don't move point)
+    (save-excursion
+      (beginning-of-line)
+      (when (re-search-backward "^~~~ *$" nil t)
+	(setq previous-label (get-text-property (point) 'tilde-block-delimiter))))
+    ;; second, assign a label
+    (save-excursion
+      (beginning-of-line)
+      (cond
+       ((eq previous-label 'start)
+	(put-text-property (point) (1+ (point)) 'tilde-block-delimiter 'end)
+	(setq jemdoc-mode-tilde-block-delimiter-last-value 'end))
+       ;; for previous-label = {'end, nil}
+       ;; when previous-label = nil, we are at a starting delimiter
+       (t
+	(put-text-property (point) (1+ (point)) 'tilde-block-delimiter 'start)
+	(setq jemdoc-mode-tilde-block-delimiter-last-value 'start)))
+
+      ;; here I have to go back before START because START might be
+      ;; inside of a tilde-block
+      (setq tmp (previous-single-property-change (point) 'tilde-block-delimiter))
+      (when tmp
+	(beginning-of-line)
+	(goto-char tmp)
+	(goto-char (line-beginning-position 2))
+	;; code-block
+	(when (looking-at "^ *\\({[^}{]*} *\\)\\{2,2\\}$")
+	  (let ((start (line-beginning-position 2))
+		(end (progn
+		       (re-search-forward "^~~~ *$" nil t)
+		       (line-end-position 0))))
+	    (put-text-property start end  'font-lock-ignore t)
+	    (remove-text-properties start end '(face nil))
+	    ;;(message "ignore: %d - %d" start end)
+	    )))
+      )))
 
 (defun jemdoc-mode-property-assign ()
   "Assign text properties in keywords in comments."
@@ -431,55 +482,39 @@ return a cell array with its beginning and end.  If not, return nil.
 
 TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
   (save-excursion
-    (let ((p (point))
-	  (regexp
-	   (if (eq tilde-block-type 'code-block)
-	       ;; code block
-	       "^ *\\({[^}{]*} *\\)\\{2,2\\}$"
-	     ;; general-block
-	     "^ *\\(\\({[^}{]*} *\\)\\{1,2\\}\\|\\({[^}{]*} *\\)\\{7,7\\}\\)$"))
+    (let ((code-block-regexp "^ *\\({[^}{]*} *\\)\\{2,2\\}$")
 	  beg
 	  end)
-      (catch 'drdv-return
 
-	(beginning-of-line)
-	(if (and (re-search-forward "^~~~ *$" nil t)
-		 (save-excursion
-		   (goto-char (line-beginning-position 2))
-		   (not (looking-at regexp))))
-	    (setq end (match-end 0))
-	  (throw 'drdv-return nil))
+      (beginning-of-line)
+      (cond
+       ;; On a closing "^~~~ *$"
+       ((eq (get-text-property (point) 'tilde-block-delimiter) 'end)
+	(setq end (line-end-position 1))
+	(re-search-backward "^~~~ *$" nil t)
+	(setq beg (point)))
+       ;; On an opening "^~~~ *$"
+       ((eq (get-text-property (point) 'tilde-block-delimiter) 'start)
+	(setq beg (point))
+	(end-of-line)
+	(re-search-forward "^~~~ *$" nil t)
+	(setq end (point)))
+       (t
+	(when (and (re-search-backward "^~~~ *$" nil t)
+		   (eq (get-text-property (point) 'tilde-block-delimiter) 'start))
+	  (setq beg (point))
+	  (end-of-line)
+	  (re-search-forward "^~~~ *$" nil t)
+	  (setq end (point)))))
 
-	(beginning-of-line)
-	(if (re-search-backward "^~~~ *$" nil t)
-	    (setq beg (match-beginning 0))
-	  (throw 'drdv-return nil))
-
-	(goto-char (line-beginning-position 2))
-	(if (looking-at regexp)
-	    `(,beg . ,end)
-	  nil)))))
-
-(defun jemdoc-mode-ignore-region ()
-  "Assign text property 'font-lock-ignore to code-blocks."
-  (let ((region (jemdoc-mode-in-tilde-block-internal 'code-block)))
-    (when region
-      (let ((start (save-excursion
-		     (goto-char (car region))
-		     ;; leave the highlightling of the opening ~~~\n{}{}
-		     (line-beginning-position 3)))
-	    (end (save-excursion
-		   (goto-char (cdr region))
-		   ;; leave the highlightling of the closing ~~~
-		   (line-end-position 0))))
-
-	(put-text-property start end  'font-lock-ignore t)
-	(remove-text-properties start end '(face nil))
-
-	;; move point after the block
-	(goto-char (save-excursion
-		     (goto-char (cdr region))
-		     (line-beginning-position 2)))))))
+      (when beg
+	(cond
+	 ((eq tilde-block-type 'general-block) `(,beg . ,end))
+	 ((eq tilde-block-type 'code-block)
+	  (goto-char beg)
+	  (goto-char (line-beginning-position 2))
+	  (when (looking-at code-block-regexp)
+	    `(,beg . ,end))))))))
 
 
 
