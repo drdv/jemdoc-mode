@@ -20,8 +20,11 @@ build: package-lint
 cask:
 	${CASK} install
 
+test: # build
+	${CASK} exec ert-runner
+
 clean :
 	@rm -f *.elc
 	@rm -rf .cask
 
-.PHONY:	all checkdoc package-lint build cask clean
+.PHONY:	all checkdoc package-lint build cask test clean
