@@ -455,29 +455,30 @@ registered in `font-lock-extend-region-functions'."
 
 (defun jemdoc-mode-concat-string (str n)
   "Concatenate a string STR, N times."
-  (let ((out-str))
-    (while (> n 0)
-      (setq out-str (concat out-str str))
-      (setq n (1- n)))
+  (let (out-str)
+    (dotimes (k n)
+      (setq out-str (concat out-str str)))
     out-str))
 
-(defun jemdoc-mode-end-of-block (str n)
-  "Return position of next delimiter.
-
+(defun jemdoc-mode-end-of-block-delimiter (str n)
+  "Return regexp describing an end of block delimiter.
 Delimiters can be: empty line, end of buffer, or line starting with
 STR appearing N or less times in a row."
+  ;; an empty line ("^$"),
+  ;; end of buffer ("\\'") or
+  ;; a line starting with 1, ..., n str
+  (let ((S "\\(\\'\\|^ *$"))
+    (dotimes (k n)
+      (setq S (concat
+	       S
+	       (format "\\|^ *%s +" (jemdoc-mode-concat-string str (- n k))))))
+    (setq S (concat S "\\)"))))
+
+(defun jemdoc-mode-end-of-block (str n)
+  "Return position of next end of block delimiter.
+See `jemdoc-mode-end-of-block-delimiter'."
   (save-excursion
-    ;; find an empty line ("^$"), end of buffer ("\\'")
-    ;; or a line starting with 1, ..., n str
-    (re-search-forward
-     (let ((S "\\(\\'\\|^ *$"))
-       (while (> n 0)
-	 (setq S (concat
-		  S
-		  (format "\\|^ *%s +" (jemdoc-mode-concat-string str n))))
-	 (setq n (1- n)))
-       (setq S (concat S "\\)")))
-     nil t)))
+    (re-search-forward (jemdoc-mode-end-of-block-delimiter str n) nil t)))
 
 
 

@@ -202,3 +202,13 @@ Check whether jemdoc-mode-tilde-block-delimiter-last-value == 'start."
 			( 120 .  126))))
       (dolist (pair test-pairs)
 	(should (equal (text-property-any (car pair)  (cdr pair) 'face 'jemdoc-mode-face-special-keywords) nil))))))
+
+(ert-deftest test-jemdoc-mode-concat-string ()
+  "Test `jemdoc-mode-concat-string'."
+  (should (equal (jemdoc-mode-concat-string "alo-" 4) "alo-alo-alo-alo-")))
+
+(ert-deftest test-jemdoc-mode-end-of-block-delimiter ()
+  "Test `jemdoc-mode-end-of-block-delimiter'."
+  (should
+   (equal (jemdoc-mode-end-of-block-delimiter "alo-" 3)
+	  "\\(\\'\\|^ *$\\|^ *alo-alo-alo- +\\|^ *alo-alo- +\\|^ *alo- +\\)")))
