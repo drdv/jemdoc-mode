@@ -4,7 +4,7 @@
 
 ;; Author: Dimitar Dimitrov <mail.mitko@gmail.com>
 ;; URL: https://github.com/drdv/jemdoc-mode
-;; Package-Version: 20170529.1
+;; Package-Version: 20170609.1
 ;; Package-Requires: ((emacs "24.3"))
 ;; Keywords: convenience, usability
 
