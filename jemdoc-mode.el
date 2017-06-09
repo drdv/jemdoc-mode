@@ -170,6 +170,9 @@ or #include{name of file}."
 (defvar-local jemdoc-mode-debug-messages nil
   "Set to non-nil to output debug messages.")
 
+(defvar-local jemdoc-mode-warning-messages t
+  "Set to non-nil to output warning messages.")
+
 (defvar jemdoc-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-x n r") 'jemdoc-mode-edit-code-block)
@@ -223,12 +226,13 @@ Text properties:
 		     "addjs" "addpackage" "addtex" "analytics" "title"
 		     "noeqs" "noeqcache" "eqsize" "eqdir")
 		   'words)
-       (0 (ignore (jemdoc-mode-property-assign))))
+       (0 (ignore (jemdoc-mode-keywords-in-comments-property-assign))))
       ;; handle tilde blocks
       ("^~~~ *$"
        (0 (ignore (jemdoc-mode-tilde-block-text-properties)))))
      start end))
-  (when (eq jemdoc-mode-tilde-block-delimiter-last-value 'start)
+  (when (and jemdoc-mode-warning-messages
+	     (eq jemdoc-mode-tilde-block-delimiter-last-value 'start))
     (message "Warning: wrong delimiters of tilde blocks.")))
 
 (defun jemdoc-mode-tilde-block-text-properties ()
@@ -278,7 +282,7 @@ Text properties:
 	    (remove-text-properties start end '(face nil))
 	    ))))))
 
-(defun jemdoc-mode-property-assign ()
+(defun jemdoc-mode-keywords-in-comments-property-assign ()
   "Assign text properties in keywords in comments."
   (let* ((beg (match-beginning 0))
 	 (str-line (thing-at-point 'line t))
@@ -293,7 +297,7 @@ Text properties:
 			 'jemdoc-keywords-in-comments-property
 			 (cons (nth 4 context) (match-data))))))
 
-(defun jemdoc-mode-property-retrieve (limit)
+(defun jemdoc-mode-keywords-in-comments-property-retrieve (limit)
   "Highlight text with jemdoc-keywords-in-comments-property (until LIMIT)."
   (let ((pos
 	 (next-single-char-property-change (point)
@@ -307,7 +311,7 @@ Text properties:
             (progn
               (set-match-data (cdr value))
               t)
-          (jemdoc-mode-property-retrieve limit))))))
+          (jemdoc-mode-keywords-in-comments-property-retrieve limit))))))
 
 
 
@@ -871,7 +875,8 @@ BUTTON is the standard input given to functions registerd in the
      0 'jemdoc-mode-face-http-mail prepend)
 
    ;; syntax-table stuff
-   '(jemdoc-mode-property-retrieve 0 'jemdoc-mode-face-special-keywords t)
+   '(jemdoc-mode-keywords-in-comments-property-retrieve
+     0 'jemdoc-mode-face-special-keywords t)
 
    ;; #include{...} and #includeraw{...}
    ;; since I use "t" as a third argument I can directly nest \\(.*?\\)

@@ -39,6 +39,12 @@ Ordinary jemdoc markup goes here.
 ~~~
 ")
 
+(defvar jemdoc-mode-keywords-in-comments
+  "# jemdoc: menu{MENU}{test.html}, fwtitle, nofooter, nodate, notime, fwtitle,
+# jemdoc: showsource, nodefaultcss, addcss, fake, addjs, addpackage, addtex,
+# jemdoc: analytics, title, noeqs, noeqcache, eqsize, eqdir
+")
+
 (ert-deftest test-jemdoc-mode-in-tilde-block-internal ()
   "Test `jemdoc-mode-in-tilde-block-internal'."
   (with-temp-buffer
@@ -146,12 +152,53 @@ Check whether jemdoc-mode-tilde-block-delimiter-last-value == 'start."
   (with-temp-buffer
     (insert jemdoc-mode-tilde-block-string)
     (jemdoc-mode)
+    ;; disable warnings
+    ;; this avoids "Warning: wrong delimiters of tilde blocks."
+    (setq jemdoc-mode-warning-messages nil)
     (font-lock-ensure)
     (sleep-for 0.1)
     (should (equal jemdoc-mode-tilde-block-delimiter-last-value 'end))
     (goto-char 439)
     ;; add an opening tilde-block delimiter without a closing one
     (insert "\n~~~\n\n")
-    ;; refontify
+    ;; force buffer fontification
     (font-lock-ensure)
     (should (equal jemdoc-mode-tilde-block-delimiter-last-value 'start))))
+
+
+(ert-deftest test-jemdoc-mode-keywords-in-comments-property ()
+  "Test `jemdoc-mode-keywords-in-comments-property-*'."
+  (with-temp-buffer
+    (insert jemdoc-mode-keywords-in-comments)
+    (jemdoc-mode)
+    (font-lock-ensure)
+    (sleep-for 0.1)
+    ;; there should be no text without a 'face property 'jemdoc-keywords-in-comments-property
+    (let ((test-pairs '((   3 .   8)
+			(  11 .  14)
+			(  34 .  40)
+			(  43 .  50)
+			(  53 .  58)
+			(  61 .  66)
+			(  69 .  75)
+			(  80 .  85)
+			(  88 .  97)
+			( 100 . 111)
+			( 114 . 119)
+			( 128 . 132)
+			( 135 . 144)
+			( 147 . 152)
+			( 157 . 162)
+			( 165 . 173)
+			( 176 . 180)
+			( 183 . 187)
+			( 190 . 198)
+			( 201 . 206)
+			( 209 . 213))))
+      (dolist (pair test-pairs)
+	(should (equal (text-property-not-all  (car pair)  (cdr pair) 'face 'jemdoc-mode-face-special-keywords) nil))))
+    ;; there should be no text with a 'face property 'jemdoc-keywords-in-comments-property
+    (let ((test-pairs '((  15 .   32)
+			( 120 .  126))))
+      (dolist (pair test-pairs)
+	(should (equal (text-property-any (car pair)  (cdr pair) 'face 'jemdoc-mode-face-special-keywords) nil))))))
