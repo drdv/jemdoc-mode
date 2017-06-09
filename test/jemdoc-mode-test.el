@@ -1,4 +1,13 @@
-(defvar jemdoc-mode-test-string
+;; -----------------------------------------------------------------------------
+;; NOTE
+;; -----------------------------------------------------------------------------
+;; font-lock is disabled by default in temp buffers
+;; https://stackoverflow.com/questions/23568779/elisp-font-lock-in-temp-buffer
+;; that's why I have to call (font-lock-ensure) which is apparently better than
+;; using (font-lock-fontify-buffer)
+;; -----------------------------------------------------------------------------
+
+(defvar jemdoc-mode-tilde-block-string
   "# jemdoc: menu{MENU}{test.html}, fwtitle, nofooter
 
 == test text-properties of tilde-blocks
@@ -33,12 +42,9 @@ Ordinary jemdoc markup goes here.
 (ert-deftest test-jemdoc-mode-in-tilde-block-internal ()
   "Test `jemdoc-mode-in-tilde-block-internal'."
   (with-temp-buffer
-    (insert jemdoc-mode-test-string)
+    (insert jemdoc-mode-tilde-block-string)
     (jemdoc-mode)
-    (write-file "drdv.jemdoc")
-    ;; font-lock is disabled by default in temp buffers
-    ;; https://stackoverflow.com/questions/23568779/elisp-font-lock-in-temp-buffer
-    (font-lock-ensure) ;; apparently better than using (font-lock-fontify-buffer)
+    (font-lock-ensure)
     (sleep-for 0.1)
     (let ((test-cases '(;; general-block
 			(general-block  93 nil)
@@ -87,14 +93,65 @@ Ordinary jemdoc markup goes here.
 	(goto-char (nth 1 test-case))
 	(should (equal (jemdoc-mode-in-tilde-block-internal (nth 0 test-case)) (nth 2 test-case)))))))
 
-(ert-deftest test-face ()
-  "Test `jemdoc-mode-in-tilde-block-internal'."
+(ert-deftest test-jemdoc-mode-tilde-block-text-properties ()
+  "Test `jemdoc-mode-tilde-block-text-properties'."
   (with-temp-buffer
-    (insert jemdoc-mode-test-string)
+    (insert jemdoc-mode-tilde-block-string)
     (jemdoc-mode)
-    ;; font-lock is disabled by default in temp buffers
-    ;; https://stackoverflow.com/questions/23568779/elisp-font-lock-in-temp-buffer
-    (font-lock-ensure) ;; apparently better than using (font-lock-fontify-buffer)
+    (font-lock-ensure)
     (sleep-for 0.1)
-    (should (equal (get-text-property 1 'face) 'font-lock-comment-face))
-    ))
+    (let ((test-pairs '(( 93 . nil)
+			(134 . start)
+			(160 . nil)
+			(262 . end)
+			(266 . nil)
+			(298 . start)
+			(330 . nil)
+			(422 . end)
+			(426 . nil)
+			(440 . start)
+			(500 . nil)
+			(535 . end)
+			(539 . nil)
+			(565 . start)
+			(583 . nil)
+			(654 . end)
+			(658 . nil)
+			(690 . start)
+			(730 . nil)
+			(799 . end))))
+      (dolist (pair test-pairs)
+	(should (equal (get-text-property (car pair) 'tilde-block-delimiter) (cdr pair)))))))
+
+(ert-deftest test-jemdoc-mode-tilde-block-text-properties-ignore ()
+  "Test `jemdoc-mode-tilde-block-text-properties.'
+Check whether the content of code-blocks is ignored
+i.e., it has the the text property `font-lock-ignore'."
+  (with-temp-buffer
+    (insert jemdoc-mode-tilde-block-string)
+    (jemdoc-mode)
+    (font-lock-ensure)
+    (sleep-for 0.1)
+    ;; there should be no text with a 'font-lock-ignore property t
+    (should (equal (text-property-any 138 261 'font-lock-ignore t) nil))
+    (should (equal (text-property-any 317 421 'font-lock-ignore t) nil))
+    (should (equal (text-property-any 765 798 'font-lock-ignore t) nil))
+    ;; there should be no text without a 'font-lock-ignore property t
+    (should (equal (text-property-not-all 502 534 'font-lock-ignore t) nil))
+    (should (equal (text-property-not-all 577 653 'font-lock-ignore t) nil))))
+
+(ert-deftest test-jemdoc-mode-tilde-block-text-properties-warning ()
+  "Test `jemdoc-mode-tilde-block-text-properties.'
+Check whether jemdoc-mode-tilde-block-delimiter-last-value == 'start."
+  (with-temp-buffer
+    (insert jemdoc-mode-tilde-block-string)
+    (jemdoc-mode)
+    (font-lock-ensure)
+    (sleep-for 0.1)
+    (should (equal jemdoc-mode-tilde-block-delimiter-last-value 'end))
+    (goto-char 439)
+    ;; add an opening tilde-block delimiter without a closing one
+    (insert "\n~~~\n\n")
+    ;; refontify
+    (font-lock-ensure)
+    (should (equal jemdoc-mode-tilde-block-delimiter-last-value 'start))))
