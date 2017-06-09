@@ -226,42 +226,47 @@ Text properties:
        (0 (ignore (jemdoc-mode-property-assign))))
       ;; handle tilde blocks
       ("^~~~ *$"
-       (0 (ignore (jemdoc-mode-tilde-block-start-end)))))
+       (0 (ignore (jemdoc-mode-tilde-block-text-properties)))))
      start end))
   (when (eq jemdoc-mode-tilde-block-delimiter-last-value 'start)
     (message "Warning: wrong delimiters of tilde blocks.")))
 
-(defun jemdoc-mode-tilde-block-start-end ()
-  "Assign text properties 'tilde-block-delimiter.
-start - to first character of ~~~ at the beginning of tilde-blocks
-end   - to first character of ~~~ at the end of tilde-blocks."
+(defun jemdoc-mode-tilde-block-text-properties ()
+  "Assign text properties to tilde-blocks.
+
+1. `tilde-block-delimiter' -> `start'
+   first character of ~~~ at the beginning of tilde-blocks
+2. `tilde-block-delimiter' -> `end'
+   first character of ~~~ at the end of tilde-blocks
+3. `font-lock-ignore' -> t
+   content of code-blocks."
   (let (previous-label
-	tmp)
+	single-property-change)
     ;; first, record the 'tilde-block-delimiter text property of
     ;; the previous "^~~~ *$" (don't move point)
     (save-excursion
       (beginning-of-line)
       (when (re-search-backward "^~~~ *$" nil t)
 	(setq previous-label (get-text-property (point) 'tilde-block-delimiter))))
-    ;; second, assign a label
+    ;; second, assign a 'tilde-block-delimiter text property to
+    ;; the current "^~~~ *$"
     (save-excursion
       (beginning-of-line)
       (cond
+       ;; when previous-label is 'start
        ((eq previous-label 'start)
 	(put-text-property (point) (1+ (point)) 'tilde-block-delimiter 'end)
 	(setq jemdoc-mode-tilde-block-delimiter-last-value 'end))
-       ;; for previous-label = {'end, nil}
-       ;; when previous-label = nil, we are at a starting delimiter
+       ;; when previous-label is either 'end or nil (the first delimiter)
        (t
 	(put-text-property (point) (1+ (point)) 'tilde-block-delimiter 'start)
 	(setq jemdoc-mode-tilde-block-delimiter-last-value 'start)))
 
-      ;; here I have to go back before START because START might be
-      ;; inside of a tilde-block
-      (setq tmp (previous-single-property-change (point) 'tilde-block-delimiter))
-      (when tmp
-	(beginning-of-line)
-	(goto-char tmp)
+      ;; here I have to go back to the beginning of the containing tilde-block
+      (setq single-property-change
+	    (previous-single-property-change (point) 'tilde-block-delimiter))
+      (when single-property-change
+	(goto-char single-property-change)
 	(goto-char (line-beginning-position 2))
 	;; code-block
 	(when (looking-at "^ *\\({[^}{]*} *\\)\\{2,2\\}$")
@@ -271,9 +276,7 @@ end   - to first character of ~~~ at the end of tilde-blocks."
 		       (line-end-position 0))))
 	    (put-text-property start end  'font-lock-ignore t)
 	    (remove-text-properties start end '(face nil))
-	    ;;(message "ignore: %d - %d" start end)
-	    )))
-      )))
+	    ))))))
 
 (defun jemdoc-mode-property-assign ()
   "Assign text properties in keywords in comments."
@@ -474,13 +477,15 @@ STR appearing N or less times in a row."
 
 
 
-(defun jemdoc-mode-in-tilde-block-internal (tilde-block-type)
+(defun jemdoc-mode-in-tilde-block-internal (&optional tilde-block-type)
   "Check whether point is inside a tilde block.
 
 If point is inside a tilde block with type TILDE-BLOCK-TYPE,
 return a cell array with its beginning and end.  If not, return nil.
 
 TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
+  (or tilde-block-type (setq tilde-block-type 'general-block))
+
   (save-excursion
     (let ((code-block-regexp "^ *\\({[^}{]*} *\\)\\{2,2\\}$")
 	  beg
@@ -499,17 +504,22 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
 	(end-of-line)
 	(re-search-forward "^~~~ *$" nil t)
 	(setq end (point)))
+       ;; Not on a "^~~~ *$" line
        (t
 	(when (and (re-search-backward "^~~~ *$" nil t)
 		   (eq (get-text-property (point) 'tilde-block-delimiter) 'start))
 	  (setq beg (point))
 	  (end-of-line)
+	  ;; to to closing "^~~~ *$"
 	  (re-search-forward "^~~~ *$" nil t)
 	  (setq end (point)))))
 
+      ;; when we are in a gelera tilde-block
       (when beg
 	(cond
+	 ;; when checking for a general-block
 	 ((eq tilde-block-type 'general-block) `(,beg . ,end))
+	 ;; when checking for a code-block
 	 ((eq tilde-block-type 'code-block)
 	  (goto-char beg)
 	  (goto-char (line-beginning-position 2))
