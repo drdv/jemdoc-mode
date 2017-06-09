@@ -462,8 +462,8 @@ registered in `font-lock-extend-region-functions'."
 
 (defun jemdoc-mode-end-of-block-delimiter (str n)
   "Return regexp describing an end of block delimiter.
-Delimiters can be: empty line, end of buffer, or line starting with
-STR appearing N or less times in a row."
+Delimiters can be: empty line, end of buffer, or line starting with STR
+appearing N or less times in a row."
   ;; an empty line ("^$"),
   ;; end of buffer ("\\'") or
   ;; a line starting with 1, ..., n str
@@ -476,7 +476,8 @@ STR appearing N or less times in a row."
 
 (defun jemdoc-mode-end-of-block (str n)
   "Return position of next end of block delimiter.
-See `jemdoc-mode-end-of-block-delimiter'."
+Delimiters can be: empty line, end of buffer, or line starting with STR
+appearing N or less times in a row.  See `jemdoc-mode-end-of-block-delimiter'."
   (save-excursion
     (re-search-forward (jemdoc-mode-end-of-block-delimiter str n) nil t)))
 
