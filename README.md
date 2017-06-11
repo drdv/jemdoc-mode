@@ -13,7 +13,7 @@ the [MELPA](http://melpa.org) package repository.
 
 #### Manually
 
-Ensure `jemdoc-mode.el` is in a directory on your load-path, and add `(require 'jemdoc-mode)`
+Ensure that `jemdoc-mode.el` is in a directory on your load-path, and add `(require 'jemdoc-mode)`
 to your `~/.emacs` or `~/.emacs.d/init.el`.
 
 # Note:
