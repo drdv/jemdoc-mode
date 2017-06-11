@@ -165,7 +165,7 @@ or #include{name of file}."
 
 
 (defvar-local jemdoc-mode-tilde-block-delimiter-last-value nil
-  "Record the last assigned value of the text property `tilde-block-delimiter'.")
+  "Holds the last assigned value of the text property `tilde-block-delimiter'.")
 
 (defvar-local jemdoc-mode-debug-messages nil
   "Set to non-nil to output debug messages.")
@@ -251,7 +251,8 @@ Text properties:
     (save-excursion
       (beginning-of-line)
       (when (re-search-backward "^~~~ *$" nil t)
-	(setq previous-label (get-text-property (point) 'tilde-block-delimiter))))
+	(setq previous-label
+	      (get-text-property (point) 'tilde-block-delimiter))))
     ;; second, assign a 'tilde-block-delimiter text property to
     ;; the current "^~~~ *$"
     (save-excursion
@@ -513,7 +514,8 @@ TILDE-BLOCK-TYPE can be 'code-block, 'general-block."
        ;; Not on a "^~~~ *$" line
        (t
 	(when (and (re-search-backward "^~~~ *$" nil t)
-		   (eq (get-text-property (point) 'tilde-block-delimiter) 'start))
+		   (eq (get-text-property (point) 'tilde-block-delimiter)
+		       'start))
 	  (setq beg (point))
 	  (end-of-line)
 	  ;; to to closing "^~~~ *$"
