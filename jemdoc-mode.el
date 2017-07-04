@@ -735,8 +735,7 @@ BUTTON is the standard input given to functions registerd in the
 	 (preamble-length
 	  (+ (length jemdoc-mode-edit-insert-button-name)
 	     (length jemdoc-mode-edit-abort-button-name)
-	     (length jemdoc-mode-edit-preamble-termination-indicator)
-	     1))
+	     (length jemdoc-mode-edit-preamble-termination-indicator)))
 	 (code (buffer-substring-no-properties
 	       (1+ preamble-length)
 	       (point-max))))
